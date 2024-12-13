@@ -8,4 +8,3 @@ type Contribution struct {
 	Amount float64   `json:"amount"`
 	Date   time.Time `json:"date"`
 }
-

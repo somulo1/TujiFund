@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"your-project/controllers"
-	"your-project/middleware"
+	"tujifund/backend/controllers"
+	"tujifund/backend/middleware"
 )
 
 func SetupMemberRoutes(mux *http.ServeMux) {

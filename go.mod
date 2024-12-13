@@ -1,4 +1,4 @@
-module ChamaApp
+module tujifund
 
 go 1.22.2
 

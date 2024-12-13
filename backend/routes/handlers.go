@@ -5,30 +5,31 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"tujifund/backend/models"
 )
 
-type Member struct {
-	ID       string `json:"id"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
+// type models.User struct {
+// 	ID       string `json:"id"`
+// 	Phone    string `json:"phone"`
+// 	Email    string `json:"email"`
+// 	Password string `json:"password"`
+// }
 
 var (
-	members   = make(map[string]Member) // In-memory store for members (keyed by ID)
-	emailToID = make(map[string]string) // Map to link emails to IDs
-	mu        sync.Mutex                // Mutex to handle concurrent access
+	Users     = make(map[int]models.User) // In-memory store for models.Users (keyed by ID)
+	emailToID = make(map[string]string)      // Map to link emails to IDs
+	mu        sync.Mutex                     // Mutex to handle concurrent access
 )
 
-// function to handle member registration
+// function to handle models.User registration
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var newMember Member
-	if err := json.NewDecoder(r.Body).Decode(&newMember); err != nil {
+	var newUser models.User
+	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -36,25 +37,25 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	if _, exists := members[newMember.ID]; exists {
-		http.Error(w, "Member with this ID already registered", http.StatusConflict)
+	if _, exists := Users[newUser.ID]; exists {
+		http.Error(w, "models.User with this ID already registered", http.StatusConflict)
 		return
 	}
 
-	if _, emailExists := emailToID[newMember.Email]; emailExists {
+	if _, emailExists := emailToID[newUser.Email]; emailExists {
 		http.Error(w, "Email already registered", http.StatusConflict)
 		return
 	}
 
-	// Add member to the map
-	members[newMember.ID] = newMember
-	emailToID[newMember.Email] = newMember.ID
+	// Add models.User to the map
+	Users[newUser.ID] = newUser
+	emailToID[newUser.Email] = newUser.ID
 
 	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "Member registered successfully")
+	fmt.Fprintf(w, "models.User registered successfully")
 }
 
-// function to handle member login
+// function to handle models.User login
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -75,16 +76,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	// Get the member ID from the email
+	// Get the models.User ID from the email
 	id, exists := emailToID[loginReq.Email]
 	if !exists {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	// Get the member by ID and check the password
-	member := members[id]
-	if member.Password != loginReq.Password {
+	// Get the models.User by ID and check the password
+	User := Users[id]
+	if User.Password != loginReq.Password {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}

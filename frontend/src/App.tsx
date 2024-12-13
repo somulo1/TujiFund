@@ -7,6 +7,10 @@ import { ContributionsPage } from './pages/contributions';
 import { MembersPage } from './pages/members';
 import { DividendsPage } from './pages/dividends';
 import { useAuthStore } from './store/auth';
+import ContributionList from './components/member_dash_comp/contribution-list';
+import ContributionForm from './components/member_dash_comp/contribution-form';
+import { MemberList } from './components/members/member-list';
+import {MemberProfile} from "./components/member_dash_comp/member-profile";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -27,7 +31,31 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+const members = [
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Smith' },
+  // Add more members as needed
+];
+
+const onSelectMember = (memberId: number) => {
+  console.log(`Selected member ID: ${memberId}`);
+  // Add your logic for handling member selection here
+};
+
+// Update MemberList component usage
+<MemberList members={members} onSelectMember={onSelectMember} />
 export default function App() {
+  const members = [
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Smith' },
+    // Add more members as needed
+  ];
+
+  const onSelectMember = (memberId: number) => {
+    console.log(`Selected member ID: ${memberId}`);
+    // Add your logic for handling member selection here
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -58,6 +86,46 @@ export default function App() {
             <PrivateRoute>
               <AppLayout>
                 <MembersPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/contribution-list"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ContributionList />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/contribution-form"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ContributionForm />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/member-list"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <MemberList members={members} onSelectMember={onSelectMember} />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/member-profile"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <MemberProfile />
               </AppLayout>
             </PrivateRoute>
           }

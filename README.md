@@ -1,7 +1,7 @@
 # TujiFund
 
 
-
+```
 /chama-app
 ├── /backend
 │   ├── /cmd
@@ -73,3 +73,4 @@
 │   └── README.md                     # High-level documentation and project overview
 └── /scripts
     └── deploy.sh                     # Deployment scripts (Docker, CI/CD, etc.)
+```

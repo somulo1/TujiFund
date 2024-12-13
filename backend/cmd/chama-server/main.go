@@ -4,18 +4,18 @@ import (
 	"log"
 	"net/http"
 
+	"tujifund/backend/database"
 	"tujifund/backend/routes"
-	"tujifund/backend/utils"
 )
 
 func main() {
 	// Initialize database connection
-	err := utils.InitDB()
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
-	}
+	database.InitDB()
+	// if err != nil {
+	// 	log.Fatalf("Failed to initialize database: %v", err)
+	// }
 
-	http.HandleFunc("/register", routes.RegisterHandler)
+	http.HandleFunc("/register", routes.RegisterUserHandler)
 	http.HandleFunc("/login", routes.LoginHandler)
 
 	port := "8080"

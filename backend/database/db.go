@@ -68,12 +68,12 @@ func AddGroup(group *models.Chama) error {
 	// initialize dialect
 	result = DB.Create(group)
 	if result.Error != nil {
-		 return fmt.Errorf("failed to add user: %w", result.Error)
+		return fmt.Errorf("failed to add user: %w", result.Error)
 	}
 	fmt.Println("User added successfully", group.Name)
 	return nil
 }
 
-func GroupExists(groupName string) bool{
+func GroupExists(groupName string) bool {
 	return false
 }

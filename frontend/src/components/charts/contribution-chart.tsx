@@ -7,6 +7,13 @@ const data = [
   { month: 'Apr', amount: 95000 },
   { month: 'May', amount: 120000 },
   { month: 'Jun', amount: 150000 },
+  { month: 'may', amount: 150000 },
+  { month: 'July', amount: 0 },
+  { month: 'Aug', amount: 150},
+  { month: 'sept', amount: 150 },
+  { month: 'oct', amount: 150 },
+  { month: 'nov', amount: 150 },
+  { month: 'dec', amount: 1500 },
 ];
 
 export function ContributionChart() {

@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/auth';
 
 const memberNavItems = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-  { name: 'Contributions', href: '/contributions', icon: Wallet },
+  { name: 'Contributions', href: '/components/contributions', icon: Wallet },
 ];
 
 const adminNavItems = [

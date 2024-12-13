@@ -1,3 +1,4 @@
+// login.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
@@ -95,6 +96,7 @@ export function LoginPage() {
           <Button type="submit" className="w-full">
             Sign in
           </Button>
+          <p>dont have and account? <a href="register">register</a></p>
         </form>
       </div>
     </div>

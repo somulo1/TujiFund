@@ -60,7 +60,11 @@ const ContributionList: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.header}>Contribution List</h2>
+      <h1 style={styles.header}>Contributions</h1>
+      <div className="flex space-x-4 mb-4">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => alert('Viewing full report...')}>View Full Report</button>
+        <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => alert('Downloading statement...')}>Download Statement</button>
+      </div>
       <table style={styles.table}>
         <thead>
           <tr>

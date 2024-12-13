@@ -1,10 +1,15 @@
 import { BarChart3, Users, Wallet } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/auth';
+import { Link } from 'react-router-dom';
 
 const memberNavItems = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-  { name: 'Contributions', href: '/components/contributions', icon: Wallet },
+  { name: 'Contributions', href: '/member_dash_comp/contribution-list', icon: Wallet },
+  { name: 'Contribution Form', href: '/member_dash_comp/contribution-form', icon: Wallet },
+  { name: 'Member List', href: '/member_dash_comp/member-list', icon: Users },
+  { name: 'Member Profile', href: '/member_dash_comp/member-profile', icon: Users },
+  { name: 'Dividend Distribution', href: '/dividends/distribution', icon: Wallet },
 ];
 
 const adminNavItems = [
@@ -25,8 +30,8 @@ export function Sidebar() {
               <ul role="list" className="-mx-2 space-y-1">
                 {navItems.map((item) => (
                   <li key={item.name}>
-                    <a
-                      href={item.href}
+                    <Link
+                      to={item.href}
                       className={cn(
                         'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
                         'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
@@ -34,7 +39,7 @@ export function Sidebar() {
                     >
                       <item.icon className="h-6 w-6 shrink-0" />
                       {item.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

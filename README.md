@@ -1,6 +1,20 @@
 # TujiFund
 
 
+# TUJIFUND
+
+Start sqlite3 db
+```
+sqlite3 tujifund.db
+```
+update dependencies
+```
+go mod tidy
+```
+run go server
+
+```
+go run backend/cmd/chama-server/main.go 
 ```
 /chama-app
 ├── /backend

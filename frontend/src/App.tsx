@@ -10,7 +10,14 @@ import { useAuthStore } from './store/auth';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
 import { MemberList } from './components/members/member-list';
-import {MemberProfile} from "./components/member_dash_comp/member-profile";
+import { MemberProfile } from "./components/member_dash_comp/member-profile";
+import { Dividends } from "./components/member_dash_comp/dividends";
+import { DividendDistribution } from "./components/dividends/dividend-distribution";
+import { Fine } from "./components/member_dash_comp/fine";
+import { Loans } from "./components/member_dash_comp/loans";
+import { Shares } from "./components/member_dash_comp/share";
+import { Savings } from "./components/member_dash_comp/savings";
+import SupportChat from './components/support-chat';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -27,6 +34,20 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+    </div>
+  );
+}
+
+function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        <Header />
+        <main className="flex-1 relative">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
@@ -131,11 +152,81 @@ export default function App() {
           }
         />
         <Route
+          path="/member_dash_comp/dividends"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Dividends memberId="current-user-id" />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/fines"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Fine memberId="current-user-id" />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/loans"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <Loans />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/shares"
+          element={
+            <PrivateRoute>
+              <DashboardLayout>
+                <Shares />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/savings"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <Savings />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dividends/distribution"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <DividendDistribution />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/dividends"
           element={
             <PrivateRoute>
               <AppLayout>
                 <DividendsPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/support-chat"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <SupportChat />
               </AppLayout>
             </PrivateRoute>
           }

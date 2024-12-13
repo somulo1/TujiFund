@@ -1,3 +1,4 @@
+import { Button } from '../ui/button';
 import { useState, useEffect } from 'react';
 import { User } from 'lucide-react';
 import { members } from '../../lib/api';
@@ -71,7 +72,6 @@ export function MemberProfile({ memberId }: MemberProfileProps) {
           </div>
         </div>
       </div>
-
       {/* Profile Details */}
       <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
         <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
@@ -161,6 +161,12 @@ export function MemberProfile({ memberId }: MemberProfileProps) {
               <span className="ml-2 text-sm text-gray-700">Enable Dark Mode</span>
             </label>
           </div>
+        </div>
+      </div>
+                {/* Action Buttons */}
+      <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div className="flex space-x-4">
+          <Button variant="secondary" onClick={() => alert('Change password functionality')}>Change Password</Button>
         </div>
       </div>
 

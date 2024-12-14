@@ -8,6 +8,10 @@ import { DividendsPage } from './pages/dividends';
 import { SecretaryDashboardPage } from './pages/secretary-dashboard';
 import { TreasurerDashboardPage } from './pages/treasurer-dashboard';
 import { LandingPage } from './pages/landing';
+import { GroupRegistrationPage } from './pages/group/register';
+import { RegistrationSuccessPage } from './pages/group/registration-success';
+import { MemberRegistrationPage } from './pages/auth/register-member';
+import { ChairpersonRegistrationPage } from './pages/auth/register-chairperson';
 import { useAuthStore } from './store/auth';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
@@ -50,7 +54,15 @@ export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        
+        {/* Registration Routes */}
+        <Route path="/register" element={<Navigate to="/register/member" />} />
+        <Route path="/register/member" element={<MemberRegistrationPage />} />
+        <Route path="/register/admin" element={<ChairpersonRegistrationPage />} />
+        <Route path="/group/register" element={<GroupRegistrationPage />} />
+        <Route path="/group/registration-success" element={<RegistrationSuccessPage />} />
         
         <Route
           path="/treasurer-dashboard"
@@ -119,17 +131,6 @@ export default function App() {
         />
 
         <Route
-          path="/secretary-dashboard"
-          element={
-            <PrivateRoute allowedRoles={['secretary']}>
-              <AppLayout>
-                <SecretaryDashboardPage />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
           path="/dividends"
           element={
             <PrivateRoute>
@@ -152,13 +153,13 @@ export default function App() {
         />
 
         <Route
-          path="/"
+          path="/secretary-dashboard"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <LandingPage />
-            )
+            <PrivateRoute allowedRoles={['secretary']}>
+              <AppLayout>
+                <SecretaryDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
           }
         />
       </Routes>

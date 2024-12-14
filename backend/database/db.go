@@ -22,7 +22,7 @@ func InitDB() {
 	}
 	// Migrate Schema(create table 'users')
 
-	err := DB.AutoMigrate(&models.User{}, &models.Chama{},&models.Transaction{})
+	err := DB.AutoMigrate(&models.User{}, &models.Chama{},&models.Transaction{}, &models.LoanApplication{})
 
 	if err != nil {
 		fmt.Println("failed to migrate schema: ", err)

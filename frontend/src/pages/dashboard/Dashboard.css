@@ -1,0 +1,15 @@
+.dashboard-container {
+    display: flex;
+}
+
+.main-content {
+    margin-left: 250px; /* Width of the sidebar */
+    padding: 20px;
+    flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+    }
+}

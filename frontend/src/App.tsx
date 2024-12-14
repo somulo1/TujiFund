@@ -1,28 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/layout/navbar';
-import { Navbar } from './components/layout/navbar';
 import { LoginPage } from './pages/auth/login';
 import { DashboardPage } from './pages/dashboard';
 import { ContributionsPage } from './pages/contributions';
 import { MembersPage } from './pages/members';
 import { DividendsPage } from './pages/dividends';
 import { SecretaryDashboardPage } from './pages/secretary-dashboard';
-import { TreasurerDashboardPage } from './pages/treasurer-dashboard';
 import { LandingPage } from './pages/landing';
-import { GroupRegistrationPage } from './pages/group/register';
-import { RegistrationSuccessPage } from './pages/group/registration-success';
-import { MemberRegistrationPage } from './pages/auth/register-member';
-import { ChairpersonRegistrationPage } from './pages/auth/register-chairperson';
-import { useAuthStore } from './store/auth';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
-import { DividendDistribution } from './components/dividends/dividend-distribution';
-import { DividendDistribution } from './components/dividends/dividend-distribution';
+import { useAuthStore } from './store/auth';
 
-function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
-  children: React.ReactNode;
-  allowedRoles?: string[];
-}) {
 function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
   children: React.ReactNode;
   allowedRoles?: string[];
@@ -38,18 +26,7 @@ function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairm
     return <Navigate to="/dashboard" />;
   }
 
-  return children;
-  const userRole = useAuthStore((state) => state.user?.role);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-
-  if (!userRole || !allowedRoles.includes(userRole)) {
-    return <Navigate to="/dashboard" />;
-  }
-
-  return children;
+  return <>{children}</>;
 }
 
 function AppLayout({ children }: { children: React.ReactNode }) {
@@ -66,13 +43,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+
         <Route
           path="/dashboard"
           element={
@@ -129,26 +105,6 @@ export default function App() {
         />
 
         <Route
-          path="/member_dash_comp/member-list"
-          element={
-            <PrivateRoute allowedRoles={['secretary']}>
-              <AppLayout>
-                <MemberList members={members} onSelectMember={onSelectMember} />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/member_dash_comp/member-profile"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <MemberProfile />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/secretary-dashboard"
           element={
             <PrivateRoute allowedRoles={['secretary']}>
@@ -158,7 +114,8 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

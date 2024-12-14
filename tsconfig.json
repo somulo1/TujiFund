@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"esnext","module":"esnext","strict":true,"jsx":"react-jsx","moduleResolution":"node","esModuleInterop":true,"skipLibCheck":true,"forceConsistentCasingInFileNames":true},"include":["src"]}

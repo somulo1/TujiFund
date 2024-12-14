@@ -1,9 +1,8 @@
-// login.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Button } from '../../components/ui/button';
 import { useAuthStore } from '../../store/auth';
-import { TEST_ACCOUNTS } from '../../config/auth';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -16,22 +15,35 @@ export function LoginPage() {
     e.preventDefault();
     setError('');
 
-    const account = TEST_ACCOUNTS.find(
-      (acc) => acc.email === email && acc.password === password
-    );
+    try {
+      const response = await fetch('http://localhost:8080/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Invalid email or password');
+      }
+  
+      const data = await response.json();
+      const { id, name, email: userEmail, role, token } = data;
+  
+      // Store token securely (localStorage for simplicity, but consider secure cookies for production)
+      localStorage.setItem('authToken', token);
 
-    if (!account) {
-      setError('Invalid email or password');
-      return;
+      // Update auth store
+      login({ id, name, email: userEmail, role });
+
+      navigate('/dashboard');
+    } catch (err) {
+      console.log(err)
+      const message =  'Something went wrong';
+      setError(message);
     }
-
-    login({
-      id: email,
-      name: account.name,
-      email: account.email,
-      role: account.role,
-    });
-    navigate('/dashboard');
   };
 
   return (
@@ -44,18 +56,6 @@ export function LoginPage() {
           {error && (
             <p className="mt-2 text-center text-sm text-red-600">{error}</p>
           )}
-          <div className="mt-4">
-            <p className="text-center text-sm text-gray-600">
-              Available test accounts:
-            </p>
-            <div className="mt-2 text-sm text-gray-500 space-y-1">
-              {TEST_ACCOUNTS.map((account) => (
-                <p key={account.email} className="text-center">
-                  <strong>{account.role}</strong>: {account.email} / {account.password}
-                </p>
-              ))}
-            </div>
-          </div>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -96,7 +96,7 @@ export function LoginPage() {
           <Button type="submit" className="w-full">
             Sign in
           </Button>
-          <p>dont have and account? <a href="register">register</a></p>
+          <p>Don’t have an account? <a href="register">Register</a></p>
         </form>
       </div>
     </div>

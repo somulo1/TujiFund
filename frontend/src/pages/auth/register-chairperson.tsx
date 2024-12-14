@@ -6,6 +6,7 @@ import { Card, CardContent } from '../../components/ui/card';
 import { Typography } from '../../components/ui/typography';
 import { ArrowLeft } from 'lucide-react';
 
+
 interface GroupRegistrationData {
   group_name: string;
   email: string;
@@ -16,7 +17,6 @@ interface GroupRegistrationData {
   secretary_email: string;
   treasurer_name: string;
   treasurer_email: string;
-  file?: File;
 }
 
 export function ChairpersonRegistrationPage() {
@@ -40,7 +40,7 @@ export function ChairpersonRegistrationPage() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     setError(null);
   };
@@ -58,17 +58,21 @@ export function ChairpersonRegistrationPage() {
 
     try {
       const groupFormData = new FormData();
+
+      // Append all form data
       Object.entries(formData).forEach(([key, value]) => {
         groupFormData.append(key, value);
       });
-      
+
+      // Append the selected file if it exists
       if (selectedFile) {
         groupFormData.append('file', selectedFile);
       }
 
-      const response = await fetch('/register/group', {
+      // Make the fetch request
+      const response = await fetch('http://localhost:8080/register/group', {
         method: 'POST',
-        body: groupFormData,
+        body: groupFormData, // FormData handles the headers automatically
       });
 
       if (!response.ok) {

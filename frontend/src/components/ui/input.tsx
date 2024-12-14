@@ -9,6 +9,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   endIcon?: React.ReactNode;
   fullWidth?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  label?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -19,9 +20,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     startIcon, 
     endIcon, 
     fullWidth = false,
-    size = 'md',
+    size,
     type = 'text',
     disabled,
+    label,
     ...props 
   }, ref) => {
     const baseStyles = 'rounded-md border transition-colors duration-200';
@@ -54,17 +56,26 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       lg: 'left-4',
     };
 
+    type SizeKeys = 'sm' | 'md' | 'lg';
+
+    const isSizeKey = (size: string): size is SizeKeys => {
+      return ['sm', 'md', 'lg'].includes(size);
+    };
+
+    const sizeValue = isSizeKey(size) ? size : 'md'; // Default to 'md' if size is not a valid key
+
     return (
       <div className={cn('relative', fullWidth && 'w-full')}>
+        {label && <label className="block mb-2 text-sm text-gray-700">{label}</label>}
         {startIcon && (
           <div 
             className={cn(
               'absolute top-1/2 -translate-y-1/2 text-gray-400',
-              iconPositionStyles[size]
+              iconPositionStyles[sizeValue]
             )}
           >
             {typeof startIcon === 'string' ? (
-              <span className={iconSizeStyles[size]}>{startIcon}</span>
+              <span className={iconSizeStyles[sizeValue]}>{startIcon}</span>
             ) : (
               startIcon
             )}
@@ -77,8 +88,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             baseStyles,
             focusStyles,
             errorStyles,
-            sizeStyles[size],
-            paddingStyles[size],
+            sizeStyles[sizeValue],
+            paddingStyles[sizeValue],
             fullWidth && 'w-full',
             disabled && 'bg-gray-100 cursor-not-allowed',
             className
@@ -92,11 +103,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <div 
             className={cn(
               'absolute top-1/2 -translate-y-1/2 right-3 text-gray-400',
-              iconPositionStyles[size]
+              iconPositionStyles[sizeValue]
             )}
           >
             {typeof endIcon === 'string' ? (
-              <span className={iconSizeStyles[size]}>{endIcon}</span>
+              <span className={iconSizeStyles[sizeValue]}>{endIcon}</span>
             ) : (
               endIcon
             )}

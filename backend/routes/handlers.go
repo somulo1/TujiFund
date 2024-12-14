@@ -165,7 +165,7 @@ func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	// save file
 	file, handler, err := r.FormFile("file")
 	if err != nil {
-		println("error readinf file")
+		println("error readinf file", err) // error here for files
 		internalServerErrorHandler(w)
 		return
 	}
@@ -182,21 +182,14 @@ func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Create the destination file
-	savePath := filepath.Join(saveDir, handler.Filename)
-	destFile, err := os.Create(savePath)
+	users, err := services.ReadCSV(file)
 	if err != nil {
-		println("error creating file")
-		http.Error(w, "Unable to create the file", http.StatusInternalServerError)
+		println("error readinf file", err)
+		internalServerErrorHandler(w)
 		return
 	}
-	defer destFile.Close()
-
-	// Copy the uploaded file's content to the destination file
-	if _, err := io.Copy(destFile, file); err != nil {
-		println("error saving file")
-		http.Error(w, "Unable to save the file", http.StatusInternalServerError)
-		return
+	for _, user := range users {
+		database.AddUser(&user)
 	}
 
 	if err := database.AddGroup(&group); err != nil {

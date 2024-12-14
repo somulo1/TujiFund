@@ -8,28 +8,45 @@ import (
 	"tujifund/backend/routes"
 )
 
+// CORS middleware to handle cross-origin requests
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*") // Adjust origin as needed
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Pass to the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	// Initialize database connection
 	database.InitDB()
-	// if err != nil {
-	// 	log.Fatalf("Failed to initialize database: %v", err)
-	// }
 
-	http.HandleFunc("/register", routes.RegisterUserHandler)
-	http.HandleFunc("/register/group", routes.RegisterGroupHandler)
+	mux := http.NewServeMux()
 
-	http.HandleFunc("/login", routes.LoginHandler)
-	http.HandleFunc("/total", func(w http.ResponseWriter, r *http.Request) {
-		// Call the handler to get total amount for a specific user
+	// Define routes
+	mux.HandleFunc("/register", routes.RegisterUserHandler)
+	mux.HandleFunc("/register/group", routes.RegisterGroupHandler)
+	mux.HandleFunc("/login", routes.LoginHandler)
+	mux.HandleFunc("/total", func(w http.ResponseWriter, r *http.Request) {
 		routes.GetTotalAmount(w, r)
 	})
+	mux.HandleFunc("/pay", routes.MakePaymentHandler)
+	mux.HandleFunc("/callback", routes.CallbackHandler)
 
-	http.HandleFunc("/pay", routes.MakePaymentHandler)
-	http.HandleFunc("/callback", routes.CallbackHandler)
+	// Wrap the server with CORS middleware
+	handlerWithCORS := corsMiddleware(mux)
 
 	port := "8080"
-
-	// Start server
 	log.Printf("Server is running on port %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, handlerWithCORS))
 }

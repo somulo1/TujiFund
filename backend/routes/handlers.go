@@ -13,6 +13,7 @@ import (
 
 	"tujifund/backend/database"
 	"tujifund/backend/models"
+	"tujifund/backend/services"
 )
 
 var mu sync.Mutex // Mutex to handle concurrent access
@@ -228,4 +229,40 @@ func renderErrorPage(w http.ResponseWriter, statusCode int, message string) {
 	log.Println("Error: page execution:", message)
 	http.Error(w, "Internal Server Error", statusCode)
 	// }
+}
+
+func GetTotalAmount(w http.ResponseWriter, r *http.Request) {
+	// Get the userID from the query parameter
+	userIDParam := r.URL.Query().Get("user_id")
+	if userIDParam == "" {
+		http.Error(w, "user_id is required", http.StatusBadRequest)
+		return
+	}
+
+	// Convert userID from string to uint
+	userID, err := strconv.ParseUint(userIDParam, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid user_id", http.StatusBadRequest)
+		return
+	}
+
+	// Call the service layer to get the total amount for the user
+	totalAmount, err := services.GetTotalAmount(uint(userID))
+	if err != nil {
+		http.Error(w, "Error calculating total amount", http.StatusInternalServerError)
+		return
+	}
+
+	// Create the response
+	response := map[string]interface{}{
+		"user_id":      userID,
+		"total_amount": totalAmount,
+	}
+
+	// Set content-type header to JSON and write the response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+	}
 }

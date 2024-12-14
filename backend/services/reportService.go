@@ -1,6 +1,6 @@
 package services
 
-import "your-project/models"
+import "tujifund/backend/models"
 
 func GenerateFinancialReport() (*models.Report, error) {
 	// TODO: Implement financial report generation logic

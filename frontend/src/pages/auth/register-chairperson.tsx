@@ -80,6 +80,11 @@ export function ChairpersonRegistrationPage() {
         groupFormData.append('file', selectedFile);
       }
 
+      // Debug log the FormData object
+      for (let [key, value] of groupFormData.entries()) {
+        console.log(key, value);
+      }
+
       // Make the fetch request
       const response = await fetch('http://localhost:8080/register/group', {
         method: 'POST',
@@ -91,13 +96,14 @@ export function ChairpersonRegistrationPage() {
         throw new Error(errorText || 'Group registration failed');
       }
 
-      navigate('/group/registration-success');
+      navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col py-12 sm:px-6 lg:px-8">
@@ -265,6 +271,15 @@ export function ChairpersonRegistrationPage() {
                     Upload any required group registration documents
                   </p>
                 </div>
+                <Input
+                        label="Chairman Passowrd"
+                        name="  chairman_password"
+                        type="password"
+                        value={formData.Chairman_password}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="enter your password"
+                      />
               </div>
 
               {error && (

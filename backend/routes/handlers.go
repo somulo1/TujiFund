@@ -43,6 +43,8 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // function to handle models.User login
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("enter login backend")
 	// Handle preflight requests
 	if r.Method == http.MethodOptions {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -103,66 +105,61 @@ func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := r.ParseMultipartForm(10 << 20)
+	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
-		println("error parsing multiform")
-		internalServerErrorHandler(w)
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
 
-	chairman := models.User{
-		Name:  r.FormValue("chairman_name"),
-		Email: r.FormValue("chairman_email"),
-	}
+	group := models.Chama{}
 
-	treasurer := models.User{
-		Name:  r.FormValue("treasurer_name"),
-		Email: r.FormValue("treasurer_email"),
-	}
-	secretary := models.User{
-		Name:  r.FormValue("secretary_name"),
-		Email: r.FormValue("secretary_email"),
-	}
-	// Validate form values (e.g., required fields)
-	if chairman.Name == "" || treasurer.Name == "" || secretary.Name == "" {
-		println("empty exec names")
-		http.Error(w, "Missing required user details", http.StatusBadRequest)
+	group.Name = r.FormValue("group_name")
+	group.Email = r.FormValue("email")
+	group.ChairmanName = r.FormValue("chairman_name")
+	group.TreasurerName = r.FormValue("treasurer_name")
+	group.SecretaryName = r.FormValue("secretary_name")
+
+	group.AccountNo, _ = strconv.ParseInt(r.FormValue("account_no"), 10, 64)
+	group.ChairmanEmail = r.FormValue("chairman_email")
+	group.TreasurerEmail = r.FormValue("treasurer_email")
+	group.SecretaryEmail = r.FormValue("secretary_email")
+
+	fmt.Println("Group Name:", group.Name)
+	fmt.Println("Email:", group.Email)
+	fmt.Println("Chairman Name:", group.ChairmanName)
+	fmt.Println("Treasurer Name:", group.TreasurerName)
+	fmt.Println("Secretary Name:", group.SecretaryName)
+	fmt.Println("Account No:", group.AccountNo)
+	fmt.Println("Chairman Email:", group.ChairmanEmail)
+	fmt.Println("Treasurer Email:", group.TreasurerEmail)
+	fmt.Println("Secretary Email:", group.SecretaryEmail)
+
+	if group.Name == "" || group.ChairmanName == "" || group.TreasurerName == "" || group.SecretaryName == "" {
+		println("empty exec names or group name")
+		http.Error(w, "Missing required user details or group name", http.StatusBadRequest)
 		return
 	}
 
-	groupName := r.FormValue("name")
-	if groupName == "" {
-		println("error empty group name")
-		http.Error(w, "Group name is required", http.StatusBadRequest)
-		return
-	}
+	password := r.FormValue("password")
 
+	newUser := models.User{
+		Name:     group.ChairmanName,
+		Email:    group.ChairmanEmail,
+		Password: password,
+		Role:     "Chairman",
+	}
+	
+
+	database.AddUser(&newUser)
 	// Check if group name is unique
-	if database.GroupExists(groupName) {
+	if database.GroupExists(group.Name) {
 		println("error repeated group name")
 		http.Error(w, "Group name already exists", http.StatusConflict)
 		return
 	}
-
-	accountNoString := r.FormValue("account-no")
-	accountNoInt, err := strconv.ParseInt(accountNoString, 10, 64)
-	if err != nil {
-		println("error converting acccount number to int")
-		badRequestHandler(w)
-		return
-	}
-
-	group := models.Chama{
-		Name:      r.FormValue("name"),
-		AccountNo: int64(accountNoInt),
-		Chairman:  chairman,
-		Secretary: secretary,
-		Treasurer: treasurer,
-	}
 	// verify group name is unique
 
 	// Handle file upload
-	// save file
 	file, handler, err := r.FormFile("file")
 	if err != nil {
 		println("error readinf file")
@@ -205,6 +202,8 @@ func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// add a secret bearer 
+	w.Header().Set("Authorization", "Bearer "+"secret_token")
 	fmt.Fprintf(w, "<p> Group added sucessfully</p>")
 }
 

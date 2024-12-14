@@ -9,18 +9,14 @@ type Chama struct {
 	AccountNo int64  `json:"account_no" gorm:"not null;unique"`
 	FileName  string `json:"#"`
 
-	// Relations
-	ChairmanID int64 `json:"chairman_id" gorm:"not null"`
-	Chairman   User  `json:"chairman" gorm:"foreignKey:ChairmanID"`
+	ChairmanName  string `json:"chairman_name" gorm:"not null"`
+	ChairmanEmail string `json:"chairman_email" gorm:"not null;unique"`
 
-	SecretaryID int64 `json:"secretary_id" gorm:"not null"`
-	Secretary   User  `json:"secretary" gorm:"foreignKey:SecretaryID"`
+	SecretaryName  string `json:"secretary_name" gorm:"not null"`
+	SecretaryEmail string `json:"secretary_email" gorm:"not null;unique"`
 
-	TreasurerID int64 `json:"treasurer_id" gorm:"not null"`
-	Treasurer   User  `json:"treasurer" gorm:"foreignKey:TreasurerID"`
-
-	ExecutiveID int64     `json:"executive_id" gorm:"not null"`
-	Executive   Executive `json:"executive_team" gorm:"foreignKey:ExecutiveID"`
+	TreasurerName  string `json:"treasurer_name" gorm:"not null"`
+	TreasurerEmail string `json:"treasurer_email" gorm:"not null;unique"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`

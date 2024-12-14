@@ -47,7 +47,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("enter login backend")
 	// Handle preflight requests
 	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", " http://localhost:5174")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.WriteHeader(http.StatusOK)

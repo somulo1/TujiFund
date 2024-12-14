@@ -57,16 +57,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     type SizeKeys = 'sm' | 'md' | 'lg';
-
-    const isSizeKey = (size: string): size is SizeKeys => {
-      return ['sm', 'md', 'lg'].includes(size);
-    };
-
-    const sizeValue = isSizeKey(size) ? size : 'md'; // Default to 'md' if size is not a valid key
-
-    const filteredProps = Object.fromEntries(
-      Object.entries(props).filter(([_, value]) => value !== undefined)
-    );
+    const sizeValue = (size as SizeKeys) || 'md'; // Default to 'md' if size is undefined
 
     return (
       <div className={cn('relative', fullWidth && 'w-full')}>
@@ -100,7 +91,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           ref={ref}
           disabled={disabled}
-          {...filteredProps}
+          {...props}
         />
 
         {endIcon && (
@@ -118,7 +109,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
 
-        {helperText ?? '' && (
+        {helperText && (
           <p 
             className={cn(
               'mt-1 text-sm',

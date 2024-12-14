@@ -1,28 +1,41 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Header } from './components/layout/header';
-import { Sidebar } from './components/layout/sidebar';
+import { Navbar } from './components/layout/navbar';
 import { LoginPage } from './pages/auth/login';
 import { DashboardPage } from './pages/dashboard';
 import { ContributionsPage } from './pages/contributions';
 import { MembersPage } from './pages/members';
 import { DividendsPage } from './pages/dividends';
+import { SecretaryDashboardPage } from './pages/secretary-dashboard';
+import { TreasurerDashboardPage } from './pages/treasurer-dashboard';
+import { LandingPage } from './pages/landing';
 import { useAuthStore } from './store/auth';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
-import { MemberList } from './components/members/member-list';
-import {MemberProfile} from "./components/member_dash_comp/member-profile";
+import { DividendDistribution } from './components/dividends/dividend-distribution';
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
+function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  const userRole = useAuthStore((state) => state.user?.role);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
 }
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      <Sidebar />
-      <main className="lg:pl-64">
+      <Navbar />
+      <main>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </div>
@@ -31,35 +44,25 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const members = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Smith' },
-  // Add more members as needed
-];
-
-const onSelectMember = (memberId: number) => {
-  console.log(`Selected member ID: ${memberId}`);
-  // Add your logic for handling member selection here
-};
-
-// Update MemberList component usage
-<MemberList members={members} onSelectMember={onSelectMember} />
 export default function App() {
-  const members = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Smith' },
-    // Add more members as needed
-  ];
-
-  const onSelectMember = (memberId: number) => {
-    console.log(`Selected member ID: ${memberId}`);
-    // Add your logic for handling member selection here
-  };
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        
+        <Route
+          path="/treasurer-dashboard"
+          element={
+            <PrivateRoute allowedRoles={['treasurer']}>
+              <AppLayout>
+                <TreasurerDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={
@@ -70,6 +73,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/contributions"
           element={
@@ -80,6 +84,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/members"
           element={
@@ -90,6 +95,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/member_dash_comp/contribution-list"
           element={
@@ -100,6 +106,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/member_dash_comp/contribution-form"
           element={
@@ -110,26 +117,18 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
-          path="/member_dash_comp/member-list"
+          path="/secretary-dashboard"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['secretary']}>
               <AppLayout>
-                <MemberList members={members} onSelectMember={onSelectMember} />
+                <SecretaryDashboardPage />
               </AppLayout>
             </PrivateRoute>
           }
         />
-        <Route
-          path="/member_dash_comp/member-profile"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <MemberProfile />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
+
         <Route
           path="/dividends"
           element={
@@ -140,7 +139,28 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        <Route
+          path="/dividends/distribution"
+          element={
+            <PrivateRoute allowedRoles={['treasurer']}>
+              <AppLayout>
+                <DividendDistribution />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LandingPage />
+            )
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

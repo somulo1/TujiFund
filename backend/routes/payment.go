@@ -110,11 +110,11 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		Timestamp:         time.Now(),
 	}
 
-		// Variables to store the transaction details
-		var amount float64
-		var mpesaReceiptNumber string
-		var phoneNumber int64
-		var transactionDate string
+	// Variables to store the transaction details
+	var amount float64
+	var mpesaReceiptNumber string
+	var phoneNumber int64
+	var transactionDate string
 
 	// Copy metadata items into the stored response
 	for _, item := range response.Body.StkCallback.CallbackMetadata.Item {
@@ -129,20 +129,20 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		case "MpesaReceiptNumber":
 			mpesaReceiptNumber = strconv.Itoa(int(item.Value))
 		case "TransactionDate":
-			transactionDate =  strconv.Itoa(int(item.Value))
+			transactionDate = strconv.Itoa(int(item.Value))
 		case "phoneNumber":
 			phoneNumber = int64(item.Value)
 		}
 	}
 
 	parsedTime, _ := time.Parse("20060102150405", transactionDate)
-	transaction := models.Transaction {
-		Type: "deposit",
-		Amount: amount,
+	transaction := models.Transaction{
+		TransactionType:    "deposit",
+		Amount:             amount,
 		MpesaReceiptNumber: mpesaReceiptNumber,
-		PhoneNumber: phoneNumber,
-		CreatedAt: time.Now(),
-		MpesaTime: parsedTime,
+		PhoneNumber:        phoneNumber,
+		CreatedAt:          time.Now(),
+		MpesaTime:          parsedTime,
 	}
 
 	if err := database.AddTransaction(&transaction); err != nil {
@@ -155,8 +155,6 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	for _, item := range storedResponse.CallbackMetadata {
 		fmt.Printf("{ \"Name\": \"%s\", \"Value\": %v }\n", item.Name, item.Value)
 	}
-
-
 
 	file, err := os.OpenFile("responses.json", os.O_RDWR|os.O_CREATE, 0o644)
 	if err != nil {

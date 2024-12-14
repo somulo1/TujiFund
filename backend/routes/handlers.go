@@ -10,15 +10,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
-	"text/template"
 
-	"tujifund/backend/models"
 	"tujifund/backend/database"
+	"tujifund/backend/models"
+)
 
-)
-var (
-	mu        sync.Mutex                  // Mutex to handle concurrent access
-)
+var mu sync.Mutex // Mutex to handle concurrent access
 
 // function to handle models.User registration
 func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,19 +77,21 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // register group handler
-
-func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/register" {
+func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/register/group" {
+		println("error wrong path")
 		notFoundErrorHandler(w)
 		return
 	}
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
+		println("error wrong method")
 		wrongMethodErrorHandler(w)
 		return
 	}
 
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
+		println("error parsing multiform")
 		internalServerErrorHandler(w)
 		return
 	}
@@ -112,18 +111,21 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Validate form values (e.g., required fields)
 	if chairman.Name == "" || treasurer.Name == "" || secretary.Name == "" {
+		println("empty exec names")
 		http.Error(w, "Missing required user details", http.StatusBadRequest)
 		return
 	}
 
 	groupName := r.FormValue("name")
 	if groupName == "" {
+		println("error empty group name")
 		http.Error(w, "Group name is required", http.StatusBadRequest)
 		return
 	}
 
 	// Check if group name is unique
 	if database.GroupExists(groupName) {
+		println("error repeated group name")
 		http.Error(w, "Group name already exists", http.StatusConflict)
 		return
 	}
@@ -131,6 +133,7 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	accountNoString := r.FormValue("account-no")
 	accountNoInt, err := strconv.ParseInt(accountNoString, 10, 64)
 	if err != nil {
+		println("error converting acccount number to int")
 		badRequestHandler(w)
 		return
 	}
@@ -148,6 +151,7 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	// save file
 	file, handler, err := r.FormFile("file")
 	if err != nil {
+		println("error readinf file")
 		internalServerErrorHandler(w)
 		return
 	}
@@ -158,6 +162,7 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	saveDir := "./uploads"
 	if _, err := os.Stat(saveDir); os.IsNotExist(err) {
 		if err := os.Mkdir(saveDir, os.ModePerm); err != nil {
+			println("error creating file directory")
 			http.Error(w, "Unable to create upload directory", http.StatusInternalServerError)
 			return
 		}
@@ -167,6 +172,7 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	savePath := filepath.Join(saveDir, handler.Filename)
 	destFile, err := os.Create(savePath)
 	if err != nil {
+		println("error creating file")
 		http.Error(w, "Unable to create the file", http.StatusInternalServerError)
 		return
 	}
@@ -174,11 +180,13 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Copy the uploaded file's content to the destination file
 	if _, err := io.Copy(destFile, file); err != nil {
+		println("error saving file")
 		http.Error(w, "Unable to save the file", http.StatusInternalServerError)
 		return
 	}
 
 	if err := database.AddGroup(&group); err != nil {
+		println("error adding group to db")
 		http.Error(w, "Failed to save group", http.StatusInternalServerError)
 		return
 	}
@@ -204,20 +212,20 @@ func badRequestHandler(w http.ResponseWriter) {
 
 func renderErrorPage(w http.ResponseWriter, statusCode int, message string) {
 	w.WriteHeader(statusCode)
-	tmpl, err := template.ParseFiles("template/error.html")
-	if err != nil {
-		log.Println("Error page parsing error:", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+	// tmpl, err := template.ParseFiles("template/error.html")
+	// if err != nil {
+	// 	log.Println("Error page parsing error:", err)
+	// 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	// 	return
 
-	}
-	data := struct {
-		Message string
-	}{
-		Message: message,
-	}
-	if err := tmpl.Execute(w, data); err != nil {
-		log.Println("Error: page execution:", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	// }
+	// data := struct {
+	// 	Message string
+	// }{
+	// 	Message: message,
+	// }
+	// if err := tmpl.Execute(w, data); err != nil {
+	log.Println("Error: page execution:", message)
+	http.Error(w, "Internal Server Error", statusCode)
+	// }
 }

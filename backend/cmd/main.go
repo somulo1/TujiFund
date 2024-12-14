@@ -17,6 +17,9 @@ func main() {
 
 	http.HandleFunc("/register", routes.RegisterUserHandler)
 	http.HandleFunc("/login", routes.LoginHandler)
+	http.HandleFunc("/pay", routes.MakePaymentHandler)
+
+	http.HandleFunc("/callback",routes.CallbackHandler)
 
 	port := "8080"
 

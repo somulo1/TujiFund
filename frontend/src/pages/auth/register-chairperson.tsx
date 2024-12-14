@@ -56,6 +56,17 @@ export function ChairpersonRegistrationPage() {
     setLoading(true);
     setError(null);
 
+    // Log form data before sending
+    console.log('Form Data:', formData);
+    console.log('Selected File:', selectedFile);
+
+    // Validation: Check if group name is empty
+    if (!formData.group_name) {
+      setError('Group name is required');
+      setLoading(false);
+      return;
+    }
+
     try {
       const groupFormData = new FormData();
 

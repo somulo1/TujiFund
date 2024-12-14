@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+dist
+*.test.js
+
+.gitignore
+docker-compose.override.yml

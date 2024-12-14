@@ -2,7 +2,7 @@ import { cn } from '../../lib/utils';
 import { theme } from '../../styles/theme';
 
 interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
-  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body1' | 'body2' | 'caption' | 'overline';
+  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2' | 'caption' | 'overline';
   component?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'textPrimary' | 'textSecondary';
   align?: 'left' | 'center' | 'right';
@@ -10,6 +10,21 @@ interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   noWrap?: boolean;
   children: React.ReactNode;
 }
+
+const defaultComponent: Record<TypographyProps['variant'], TypographyProps['component']> = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+  subtitle1: 'h6',
+  subtitle2: 'h6',
+  body1: 'p',
+  body2: 'p',
+  caption: 'span',
+  overline: 'span'
+} as const;
 
 export function Typography({
   className,
@@ -31,6 +46,8 @@ export function Typography({
     h4: 'text-xl font-bold leading-snug',
     h5: 'text-lg font-bold leading-snug',
     h6: 'text-base font-bold leading-snug',
+    subtitle1: 'text-lg font-medium leading-normal',
+    subtitle2: 'text-base font-medium leading-normal',
     body1: 'text-base leading-relaxed',
     body2: 'text-sm leading-relaxed',
     caption: 'text-sm leading-normal',
@@ -38,14 +55,14 @@ export function Typography({
   };
 
   const colorStyles = {
-    primary: `text-[${theme.colors.primary.main}]`,
-    secondary: `text-[${theme.colors.secondary.main}]`,
-    success: `text-[${theme.colors.success.main}]`,
-    error: `text-[${theme.colors.error.main}]`,
-    warning: `text-[${theme.colors.warning.main}]`,
-    info: `text-[${theme.colors.info.main}]`,
-    textPrimary: `text-[${theme.colors.text.primary}]`,
-    textSecondary: `text-[${theme.colors.text.secondary}]`,
+    primary: 'text-primary',
+    secondary: 'text-secondary',
+    success: 'text-success',
+    error: 'text-error',
+    warning: 'text-warning',
+    info: 'text-info',
+    textPrimary: 'text-gray-900',
+    textSecondary: 'text-gray-600',
   };
 
   const alignStyles = {
@@ -60,7 +77,7 @@ export function Typography({
         variantStyles[variant],
         colorStyles[color],
         alignStyles[align],
-        gutterBottom && 'mb-2',
+        gutterBottom && 'mb-4',
         noWrap && 'truncate',
         className
       )}
@@ -70,16 +87,3 @@ export function Typography({
     </Component>
   );
 }
-
-const defaultComponent: Record<TypographyProps['variant'], TypographyProps['component']> = {
-  h1: 'h1',
-  h2: 'h2',
-  h3: 'h3',
-  h4: 'h4',
-  h5: 'h5',
-  h6: 'h6',
-  body1: 'p',
-  body2: 'p',
-  caption: 'span',
-  overline: 'span',
-};

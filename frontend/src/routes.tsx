@@ -1,61 +1,122 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { MemberDashboard } from './pages/dashboard/member-dashboard';
-import { ContributionList } from './components/member_dash_comp/contribution-list';
-import { ContributionForm } from './components/member_dash_comp/contribution-form';
-import { Savings } from './components/member_dash_comp/savings';
-import { Fines } from './components/member_dash_comp/fines';
-import { Dividends } from './components/member_dash_comp/dividends';
-import { Loans } from './components/member_dash_comp/loans';
-import { MemberList } from './components/member_dash_comp/member-list';
-import { Share } from './components/member_dash_comp/share';
-import { MemberProfile } from './components/member_dash_comp/member-profile';
-import { Layout } from './components/layout/layout';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Navbar } from './components/layout/navbar';
+import { LoginPage } from './pages/auth/login';
+import { DashboardPage } from './pages/dashboard';
+import { ContributionsPage } from './pages/contributions';
+import { MembersPage } from './pages/members';
+import { DividendsPage } from './pages/dividends';
+import { SecretaryDashboardPage } from './pages/secretary-dashboard';
+import { LandingPage } from './pages/landing';
+import ContributionList from './components/member_dash_comp/contribution-list';
+import ContributionForm from './components/member_dash_comp/contribution-form';
+import { useAuthStore } from './store/auth';
 
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Layout />,
-    children: [
-      {
-        path: 'dashboard',
-        element: <MemberDashboard />,
-      },
-      {
-        path: 'member_dash_comp/contribution-list',
-        element: <ContributionList />,
-      },
-      {
-        path: 'member_dash_comp/contribution-form',
-        element: <ContributionForm />,
-      },
-      {
-        path: 'member_dash_comp/savings',
-        element: <Savings />,
-      },
-      {
-        path: 'member_dash_comp/fines',
-        element: <Fines />,
-      },
-      {
-        path: 'member_dash_comp/dividends',
-        element: <Dividends />,
-      },
-      {
-        path: 'member_dash_comp/loans',
-        element: <Loans />,
-      },
-      {
-        path: 'member_dash_comp/member-list',
-        element: <MemberList />,
-      },
-      {
-        path: 'member_dash_comp/shares',
-        element: <Share />,
-      },
-      {
-        path: 'member_dash_comp/member-profile',
-        element: <MemberProfile />,
-      },
-    ],
-  },
-]);
+function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const userRole = useAuthStore((state) => state.user?.role);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return <>{children}</>;
+}
+
+function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <DashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/contributions"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ContributionsPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/members"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <MembersPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/member_dash_comp/contribution-list"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ContributionList />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/member_dash_comp/contribution-form"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ContributionForm />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/secretary-dashboard"
+          element={
+            <PrivateRoute allowedRoles={['secretary']}>
+              <AppLayout>
+                <SecretaryDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

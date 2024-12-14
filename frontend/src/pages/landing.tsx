@@ -55,7 +55,7 @@ export function LandingPage() {
                   Login
                 </button>
                 <button
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate('/register-chairperson')}
                   className="px-8 py-3 text-lg font-medium rounded-md text-white bg-transparent border-2 border-white hover:bg-white hover:text-[#2c583e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
                 >
                   Register

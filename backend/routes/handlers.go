@@ -43,10 +43,21 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // function to handle models.User login
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	// Handle preflight requests
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+
+	fmt.Println("Called Successfully")
 
 	type LoginRequest struct {
 		Email    string `json:"email"`
@@ -73,6 +84,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Add CORS headers to successful responses
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Login successful")
 }

@@ -7,29 +7,9 @@ import (
 	"tujifund/backend/database"
 	"tujifund/backend/routes"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
-
-// CORS middleware to handle cross-origin requests
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", " http://localhost:5174") // Adjust origin as needed
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		// Handle preflight requests
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		// Pass to the next handler
-		next.ServeHTTP(w, r)
-	})
-}
 
 func main() {
 	// Initialize database connection
@@ -53,9 +33,9 @@ func main() {
 	r.HandleFunc("/pay", routes.MakePaymentHandler).Methods("POST")
 	r.HandleFunc("/callback", routes.CallbackHandler).Methods("POST")
 
-	// CORS configuration
-	corsObj := handlers.AllowedOrigins([]string{" http://localhost:5174"}) // Allow all origins
-	handlerWithCORS := handlers.CORS(corsObj)(r)
+	// // CORS configuration
+	// corsObj := handlers.AllowedOrigins([]string{" http://localhost:5174"}) // Allow all origins
+	handlerWithCORS := c.Handler(r)
 
 	port := "8080"
 	log.Printf("Server is running on port %s", port)

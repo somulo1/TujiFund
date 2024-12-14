@@ -6,15 +6,29 @@ import { DashboardPage } from './pages/dashboard';
 import { ContributionsPage } from './pages/contributions';
 import { MembersPage } from './pages/members';
 import { DividendsPage } from './pages/dividends';
+import { SecretaryDashboardPage } from './pages/secretary-dashboard';
 import { useAuthStore } from './store/auth';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
 import { MemberList } from './components/members/member-list';
 import {MemberProfile} from "./components/member_dash_comp/member-profile";
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
+function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  const userRole = useAuthStore((state) => state.user?.role);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
 }
 
 function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,27 +45,26 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const members = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Smith' },
-  // Add more members as needed
-];
-
-const onSelectMember = (memberId: number) => {
-  console.log(`Selected member ID: ${memberId}`);
-  // Add your logic for handling member selection here
-};
-
-// Update MemberList component usage
-<MemberList members={members} onSelectMember={onSelectMember} />
 export default function App() {
   const members = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Smith' },
+    { 
+      id: '1', 
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'member' as const,
+      joinedAt: new Date().toISOString()
+    },
+    { 
+      id: '2', 
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'member' as const,
+      joinedAt: new Date().toISOString()
+    }
     // Add more members as needed
   ];
 
-  const onSelectMember = (memberId: number) => {
+  const onSelectMember = (memberId: string) => {
     console.log(`Selected member ID: ${memberId}`);
     // Add your logic for handling member selection here
   };
@@ -126,6 +139,16 @@ export default function App() {
             <PrivateRoute>
               <AppLayout>
                 <MemberProfile />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/secretary-dashboard"
+          element={
+            <PrivateRoute allowedRoles={['secretary']}>
+              <AppLayout>
+                <SecretaryDashboardPage />
               </AppLayout>
             </PrivateRoute>
           }

@@ -21,7 +21,9 @@ func InitDB() {
 		return
 	}
 	// Migrate Schema(create table 'users')
-	err := DB.AutoMigrate(&models.User{}, &models.Chama{}, &models.Transaction{})
+
+	err := DB.AutoMigrate(&models.User{}, &models.Chama{},&models.Transaction{})
+
 	if err != nil {
 		fmt.Println("failed to migrate schema: ", err)
 		return
@@ -43,7 +45,7 @@ func AddUser(user *models.User) error {
 	if result.Error != nil {
 		return fmt.Errorf("failed to add user: %w", result.Error)
 	}
-	fmt.Println("User added successfully", user.Email)
+	fmt.Println("User added successfully:", user.Email)
 	return nil
 }
 
@@ -69,9 +71,8 @@ func AddGroup(group *models.Chama) error {
 	result = DB.Create(group)
 	if result.Error != nil {
 		return fmt.Errorf("failed to add user: %w", result.Error)
-		return fmt.Errorf("failed to add user: %w", result.Error)
 	}
-	fmt.Println("User added successfully", group.Name)
+	fmt.Println("Group added successfully:", group.Name)
 	return nil
 }
 

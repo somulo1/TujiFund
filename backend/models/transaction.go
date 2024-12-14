@@ -13,6 +13,3 @@ type Transaction struct {
 	PhoneNumber int64 `json:"phone_number" gorm:"not null"`
 	MpesaTime  time.Time `json:"paid_at" gorm:"not null"`
 }
-
-
-

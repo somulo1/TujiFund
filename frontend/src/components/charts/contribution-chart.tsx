@@ -18,17 +18,18 @@ const data = [
 
 export function ContributionChart() {
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[200px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
+        <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+          <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} />
+          <Tooltip contentStyle={{ fontSize: 10 }} />
           <Line
             type="monotone"
             dataKey="amount"
             stroke="#2563eb"
             strokeWidth={2}
+            dot={{ r: 3 }}
           />
         </LineChart>
       </ResponsiveContainer>

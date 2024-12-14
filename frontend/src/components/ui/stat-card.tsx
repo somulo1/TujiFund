@@ -3,11 +3,12 @@ import { type LucideIcon } from 'lucide-react';
 interface StatCardProps {
   title: string;
   value: string;
+  value2?: string;  // Optional second value
   icon: LucideIcon;
   trend: string;
 }
 
-export function StatCard({ title, value, icon: Icon, trend }: StatCardProps) {
+export function StatCard({ title, value, value2, icon: Icon, trend }: StatCardProps) {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center">
@@ -18,6 +19,7 @@ export function StatCard({ title, value, icon: Icon, trend }: StatCardProps) {
       </div>
       <div className="mt-4">
         <p className="text-2xl font-semibold text-gray-900">{value}</p>
+        {value2 && <p className="text-lg text-gray-600">{value2}</p>}
         <p className="mt-1 text-sm text-green-600">{trend}</p>
       </div>
     </div>

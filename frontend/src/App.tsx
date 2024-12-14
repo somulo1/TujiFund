@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/layout/navbar';
+import { Navbar } from './components/layout/navbar';
 import { LoginPage } from './pages/auth/login';
 import { DashboardPage } from './pages/dashboard';
 import { ContributionsPage } from './pages/contributions';
@@ -16,12 +17,28 @@ import { useAuthStore } from './store/auth';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
 import { DividendDistribution } from './components/dividends/dividend-distribution';
+import { DividendDistribution } from './components/dividends/dividend-distribution';
 
 function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
   children: React.ReactNode;
   allowedRoles?: string[];
 }) {
+function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const userRole = useAuthStore((state) => state.user?.role);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
   const userRole = useAuthStore((state) => state.user?.role);
 
   if (!isAuthenticated) {
@@ -56,25 +73,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        
-        {/* Registration Routes */}
-        <Route path="/register" element={<Navigate to="/register/member" />} />
-        <Route path="/register/member" element={<MemberRegistrationPage />} />
-        <Route path="/register/admin" element={<ChairpersonRegistrationPage />} />
-        <Route path="/group/register" element={<GroupRegistrationPage />} />
-        <Route path="/group/registration-success" element={<RegistrationSuccessPage />} />
-        
-        <Route
-          path="/treasurer-dashboard"
-          element={
-            <PrivateRoute allowedRoles={['treasurer']}>
-              <AppLayout>
-                <TreasurerDashboardPage />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-
         <Route
           path="/dashboard"
           element={
@@ -131,27 +129,25 @@ export default function App() {
         />
 
         <Route
-          path="/dividends"
+          path="/member_dash_comp/member-list"
+          element={
+            <PrivateRoute allowedRoles={['secretary']}>
+              <AppLayout>
+                <MemberList members={members} onSelectMember={onSelectMember} />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/member_dash_comp/member-profile"
           element={
             <PrivateRoute>
               <AppLayout>
-                <DividendsPage />
+                <MemberProfile />
               </AppLayout>
             </PrivateRoute>
           }
         />
-
-        <Route
-          path="/dividends/distribution"
-          element={
-            <PrivateRoute allowedRoles={['treasurer']}>
-              <AppLayout>
-                <DividendDistribution />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-
         <Route
           path="/secretary-dashboard"
           element={
@@ -162,6 +158,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

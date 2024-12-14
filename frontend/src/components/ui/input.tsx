@@ -64,6 +64,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const sizeValue = isSizeKey(size) ? size : 'md'; // Default to 'md' if size is not a valid key
 
+    const filteredProps = Object.fromEntries(
+      Object.entries(props).filter(([_, value]) => value !== undefined)
+    );
+
     return (
       <div className={cn('relative', fullWidth && 'w-full')}>
         {label && <label className="block mb-2 text-sm text-gray-700">{label}</label>}
@@ -96,7 +100,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           ref={ref}
           disabled={disabled}
-          {...props}
+          {...filteredProps}
         />
 
         {endIcon && (
@@ -114,7 +118,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
 
-        {helperText && (
+        {helperText ?? '' && (
           <p 
             className={cn(
               'mt-1 text-sm',

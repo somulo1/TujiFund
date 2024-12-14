@@ -9,6 +9,9 @@ type Transaction struct {
 	Amount    float64   `json:"amount" gorm:"not null"`
 	ChamaID   int64     `json:"chama_id" gorm:"not null;index"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	MpesaReceiptNumber string `json:"mpesa_receipt_no" gorm:"not null"`
+	PhoneNumber int64 `json:"phone_number" gorm:"not null"`
+	MpesaTime  time.Time `json:"paid_at" gorm:"not null"`
 }
 
 

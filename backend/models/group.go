@@ -7,7 +7,7 @@ type Chama struct {
 	Name      string `json:"group_name" gorm:"not null"`
 	Email     string `json:"email" gorm:"not null;unique"`
 	AccountNo int64  `json:"account_no" gorm:"not null;unique"`
-	FileName string `json:"#"`
+	FileName  string `json:"#"`
 
 	// Relations
 	ChairmanID int64 `json:"chairman_id" gorm:"not null"`
@@ -25,7 +25,6 @@ type Chama struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
-
 
 type Executive struct {
 	ExecutiveID int64     `json:"executive_id" gorm:"primaryKey;autoIncrement"`

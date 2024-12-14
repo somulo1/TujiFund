@@ -6,10 +6,10 @@ type User struct {
 	ID         int       `json:"id" gorm:"primaryKey"`
 	Name       string    `json:"name" gorm:"not null"`
 	Password   string    `json:"password" gorm:"not null"`
-	NationalID string    `json:"national_id" gorm:"not null"`
+	NationalID string    `json:"national_id" `
 	Email      string    `json:"email" gorm:"not null;unique"`
 	Dob        time.Time `json:"dob" gorm:"type:date"`
-	Role       Role      `json:"role" gorm:"default:visitor"`
+	Role       Role      `json:"role" gorm:"default:member"`
 	Country    string    `json:"country" gorm:"size:50"`
 	Gender     string    `json:"gender" gorm:"size:10"`
 	CreatedAt  time.Time `json:"created_at" gorm:"autocreateTime"`

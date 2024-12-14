@@ -109,20 +109,7 @@ export function Navbar() {
                 </div>
               </>
             ) : (
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => navigate('/login')}
-                  className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => navigate('/register')}
-                  className="bg-white text-[#2c583e] hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Register
-                </button>
-              </div>
+  <></>
             )}
           </div>
         </div>

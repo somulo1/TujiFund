@@ -10,6 +10,7 @@ import { LandingPage } from './pages/landing';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
 import { useAuthStore } from './store/auth';
+import { ChairpersonRegistrationPage } from './pages/auth/register-chairperson'; 
 
 function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
   children: React.ReactNode;
@@ -114,6 +115,8 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
+        <Route path="/register-chairperson" element={<ChairpersonRegistrationPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

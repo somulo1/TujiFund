@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+
 	"tujifund/backend/database"
 	"tujifund/backend/routes"
 )
@@ -23,9 +24,8 @@ func main() {
 		routes.GetTotalAmount(w, r)
 	})
 
-
 	http.HandleFunc("/pay", routes.MakePaymentHandler)
-	http.HandleFunc("/callback",routes.CallbackHandler)
+	http.HandleFunc("/callback", routes.CallbackHandler)
 
 	port := "8080"
 

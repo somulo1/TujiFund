@@ -1,6 +1,9 @@
 package services
 
-import "time"
+import (
+	"tujifund/backend/database"
+	"tujifund/backend/models"
+)
 
 // get group total amount
 // get user total savings
@@ -10,19 +13,12 @@ import "time"
 // generate report and download
 // initiate payment >> update db
 
-type Contribution struct {
-	ID       int       `json:"id"`
-	MemberID int       `json:"member_id"`
-	Amount   float64   `json:"amount"`
-	Date     time.Time `json:"date"`
-}
-
-func GetContributions() ([]Contribution, error) {
-	// TODO: Implement database query to fetch contributions
-	return []Contribution{}, nil
-}
-
-func AddContribution(contribution Contribution) error {
-	// TODO: Implement database insert for new contribution
-	return nil
+// GetTotalAmount calculates the total amount for a given userID
+func GetTotalAmount(userID uint) (float64, error) {
+	var totalAmount float64
+	err := database.DB.Model(&models.Transaction{}).
+		Where("user_id = ?", userID).
+		Select("SUM(amount)").
+		Scan(&totalAmount).Error
+	return totalAmount, err
 }

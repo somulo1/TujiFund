@@ -10,6 +10,3 @@ type Transaction struct {
 	ChamaID   int64     `json:"chama_id" gorm:"not null;index"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
-
-
-

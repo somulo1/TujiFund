@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"your-project/controllers"
+	"tujifund/backend/controllers"
 )
 
 func SetupAuthRoutes(mux *http.ServeMux) {

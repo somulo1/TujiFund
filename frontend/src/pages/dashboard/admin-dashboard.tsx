@@ -2,8 +2,32 @@ import { Users, Wallet, TrendingUp } from 'lucide-react';
 import { ContributionChart } from '../../components/charts/contribution-chart';
 import { StatCard } from '../../components/ui/stat-card';
 import { MemberList } from '../../components/members/member-list';
+import type { User } from '../../types';
 
 export function AdminDashboard() {
+  // Sample members data - replace with actual data from your backend
+  const members: User[] = [
+    {
+      id: '1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'member',
+      totalContributions: 50000
+    },
+    {
+      id: '2',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'member',
+      totalContributions: 75000
+    }
+  ];
+
+  const handleSelectMember = (id: string) => {
+    console.log('Selected member:', id);
+    // Add your member selection logic here
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -34,7 +58,7 @@ export function AdminDashboard() {
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold mb-4">Recent Members</h3>
-          <MemberList />
+          <MemberList members={members} onSelectMember={handleSelectMember} />
         </div>
       </div>
     </div>

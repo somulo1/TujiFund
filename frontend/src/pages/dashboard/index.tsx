@@ -17,6 +17,7 @@ export function DashboardPage() {
     case 'secretary':
       return <SecretaryDashboardPage />;
     case 'chairman':
+      return <MemberDashboard />;
     case 'treasurer':
       return <AdminDashboard />;
     default:

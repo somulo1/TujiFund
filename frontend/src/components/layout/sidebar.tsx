@@ -13,17 +13,9 @@ const memberNavItems = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
   { name: 'Contributions', href: '/member_dash_comp/contribution-list', icon: Wallet },
   { name: 'Achievements', href: '/member_dash_comp/contribution-form', icon: Award },
-  { name: 'Savings', href: '/member_dash_comp/savings', icon: Coins },
-  { name: 'Fines', href: '/member_dash_comp/fines', icon: AlertCircle },
-  { name: 'Dividends', href: '/member_dash_comp/dividends', icon: DollarSign },
-  { name: 'Support', href: '/support-chat', icon: MessageSquare },
-  { name: 'Loans', href: '/member_dash_comp/loans', icon: CreditCard },
+  { name: 'Savings', href: '/member_dash_comp/savings', icon: PieChart },
   { name: 'Mary-go-round', href: '/member_dash_comp/member-list', icon: Users },
-  {
-    name: "Shares",
-    href: "/member_dash_comp/shares",
-    icon: PieChart,
-  },
+  { name: 'Shares', href: '/member_dash_comp/shares', icon: PieChart },
   { name: 'Profile', href: '/member_dash_comp/member-profile', icon: Users },
 ];
 

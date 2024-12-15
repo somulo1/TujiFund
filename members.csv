@@ -1,0 +1,6 @@
+Name,Password,NationalID,Email,Dob,Role,Country,Gender
+John Doe,12345,123456789,john.doe@example.com,1990-06-15,,Kenya,Male
+Jane Smith,12345,987654321,jane.smith@example.com,1985-11-20,,Uganda,Female
+Robert Johnson,12345,112233445,robert.johnson@example.com,1992-02-10,,Tanzania,Male
+Emily Davis,12345,556677889,emily.davis@example.com,1995-07-25,,Kenya,Female
+Michael Brown,12345,998877665,michael.brown@example.com,1988-03-12,,Uganda,Male

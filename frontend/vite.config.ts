@@ -41,10 +41,11 @@ export default defineConfig({
     exclude: ['@babel/runtime'],
   },
   server: {
+    host: '0.0.0.0', // Bind to all network interfaces
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5174, // Use PORT env variable or fallback to 5174
     hmr: {
       overlay: false, // Disable the error overlay
     },
-    port: 5174,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
@@ -54,6 +55,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port: 5174,
+    host: '0.0.0.0', // Bind preview server to all network interfaces
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5174, // Use PORT env variable or fallback to 5174
   },
 });

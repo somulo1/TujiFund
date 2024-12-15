@@ -210,95 +210,45 @@ func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Handle file upload
-    file, handler, err := r.FormFile("file")
-    if err != nil {
-        sendJSONError(w, "Document upload is required", http.StatusBadRequest)
-        return
-    }
-    defer file.Close()
+	// Handle file upload
+	file, handler, err := r.FormFile("file")
+	if err != nil {
+		println("error readinf file", err) // error here for files
+		internalServerErrorHandler(w)
+		return
+	}
 
-    // Save uploaded file
-    _, err = saveUploadedFile(file, handler)
-    if err != nil {
-        sendJSONError(w, "Failed to save uploaded file: "+err.Error(), http.StatusInternalServerError)
-        return
-    }
+	defer file.Close()
 
-    // Create chairman user account
-    chairman := models.User{
-        Name:     group.ChairmanName,
-        Email:    group.ChairmanEmail,
-        Password: chairmanPassword,
-        Role:     "Chairman",
-    }
+	// Create a directory to store the file if it doesn't exist
+	saveDir := "./uploads"
+	if _, err := os.Stat(saveDir); os.IsNotExist(err) {
+		if err := os.Mkdir(saveDir, os.ModePerm); err != nil {
+			println("error creating file directory")
+			http.Error(w, "Unable to create upload directory", http.StatusInternalServerError)
+			return
+		}
+	}
 
-    // Save chairman account
-    if err := database.AddUser(&chairman); err != nil {
-        sendJSONError(w, "Failed to create chairman account", http.StatusInternalServerError)
-        return
-    }
+	users, err := services.ReadCSV(file)
+	if err != nil {
+		println("error readinf file", err)
+		internalServerErrorHandler(w)
+		return
+	}
+	for _, user := range users {
+		database.AddUser(&user)
+	}
 
-    // Save group data
-    if err := database.AddGroup(&group); err != nil {
-        sendJSONError(w, "Failed to save group", http.StatusInternalServerError)
-        return
-    }
+	if err := database.AddGroup(&group); err != nil {
+		println("error adding group to db")
+		http.Error(w, "Failed to save group", http.StatusInternalServerError)
+		return
+	}
 
-    // Send success response
-    sendJSONResponse(w, http.StatusCreated, map[string]interface{}{
-        "success": true,
-        "message": "Group registered successfully",
-        "group": map[string]interface{}{
-            "name":          group.Name,
-            "email":         group.Email,
-            "chairman_name": group.ChairmanName,
-        },
-    })
-}
-
-// Helper function to validate group data
-func isValidGroup(group *models.Chama) bool {
-    return group.Name != "" && 
-           group.ChairmanName != "" && 
-           group.TreasurerName != "" && 
-           group.SecretaryName != ""
-}
-
-// Helper function to save uploaded file
-func saveUploadedFile(file multipart.File, handler *multipart.FileHeader) (string, error) {
-    saveDir := "./uploads"
-    if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
-        return "", fmt.Errorf("failed to create upload directory: %v", err)
-    }
-
-    savePath := filepath.Join(saveDir, handler.Filename)
-    destFile, err := os.Create(savePath)
-    if err != nil {
-        return "", fmt.Errorf("failed to create destination file: %v", err)
-    }
-    defer destFile.Close()
-
-    if _, err := io.Copy(destFile, file); err != nil {
-        return "", fmt.Errorf("failed to save file: %v", err)
-    }
-
-    return savePath, nil
-}
-
-// Helper function to send JSON error responses
-func sendJSONError(w http.ResponseWriter, message string, status int) {
-    w.WriteHeader(status)
-    json.NewEncoder(w).Encode(map[string]interface{}{
-        "success": false,
-        "message": message,
-    })
-}
-
-// Helper function to send JSON responses
-func sendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
-    w.WriteHeader(status)
-    json.NewEncoder(w).Encode(data)
+	// add a secret bearer 
+	w.Header().Set("Authorization", "Bearer "+"secret_token")
+	fmt.Fprintf(w, "<p> Group added sucessfully</p>")
 }
 
 func internalServerErrorHandler(w http.ResponseWriter) {

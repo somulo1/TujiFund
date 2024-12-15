@@ -1,29 +1,38 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/layout/navbar';
+import { HomePage } from './pages/home';
+import { AboutPage } from './pages/about';
 import { LoginPage } from './pages/auth/login';
-import { DashboardPage } from './pages/dashboard';
-import { ContributionsPage } from './pages/contributions';
-import { MembersPage } from './pages/members';
-import { DividendsPage } from './pages/dividends';
-import { SecretaryDashboardPage } from './pages/secretary-dashboard';
-import { LandingPage } from './pages/landing';
-import ContributionList from './components/member_dash_comp/contribution-list';
-import ContributionForm from './components/member_dash_comp/contribution-form';
+import { MemberRegistrationPage } from './pages/auth/register-member';
+import { GroupRegistrationPage } from './pages/auth/register-chairperson';
+import { DashboardPage } from './pages/dashboard/index';
+import { MemberDashboardPage } from './pages/dashboard/member';
+import { ChairpersonDashboardPage } from './pages/dashboard/chairperson';
+import { TreasurerDashboardPage } from './pages/dashboard/treasurer';
+import { SecretaryDashboardPage } from './pages/dashboard/secretary';
+import { ProfilePage } from './pages/dashboard/profile';
+import { ContributionsPage } from './pages/group/contributions';
+import { MembersPage } from './pages/group/members';
+import { DividendsPage } from './pages/group/dividends';
+import { MakeDepositPage } from './pages/group/make-deposit';
 import { useAuthStore } from './store/auth';
+import { USER_ROLES, ROUTES } from './config/constants';
 
-function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
+interface PrivateRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
-}) {
+}
+
+function PrivateRoute({ children, allowedRoles = Object.values(USER_ROLES) }: PrivateRouteProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const userRole = useAuthStore((state) => state.user?.role);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to={ROUTES.LOGIN} />;
   }
 
   if (!userRole || !allowedRoles.includes(userRole)) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to={ROUTES.DASHBOARD} />;
   }
 
   return <>{children}</>;
@@ -31,9 +40,9 @@ function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairm
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a472a] to-[#2c583e]">
       <Navbar />
-      <main>
+      <main className="pt-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </div>
@@ -42,15 +51,20 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        {/* Public Routes */}
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.ABOUT} element={<AboutPage />} />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.REGISTER_MEMBER} element={<MemberRegistrationPage />} />
+        <Route path={ROUTES.REGISTER_GROUP} element={<GroupRegistrationPage />} />
 
+        {/* Protected Routes */}
         <Route
-          path="/dashboard"
+          path={ROUTES.DASHBOARD}
           element={
             <PrivateRoute>
               <AppLayout>
@@ -61,7 +75,62 @@ export default function App() {
         />
 
         <Route
-          path="/contributions"
+          path="/dashboard/member"
+          element={
+            <PrivateRoute allowedRoles={[USER_ROLES.MEMBER]}>
+              <AppLayout>
+                <MemberDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/chairperson"
+          element={
+            <PrivateRoute allowedRoles={[USER_ROLES.CHAIRPERSON]}>
+              <AppLayout>
+                <ChairpersonDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/treasurer"
+          element={
+            <PrivateRoute allowedRoles={[USER_ROLES.TREASURER]}>
+              <AppLayout>
+                <TreasurerDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/secretary"
+          element={
+            <PrivateRoute allowedRoles={[USER_ROLES.SECRETARY]}>
+              <AppLayout>
+                <SecretaryDashboardPage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path={ROUTES.PROFILE}
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <ProfilePage />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/group/contributions"
           element={
             <PrivateRoute>
               <AppLayout>
@@ -72,7 +141,7 @@ export default function App() {
         />
 
         <Route
-          path="/members"
+          path="/group/members"
           element={
             <PrivateRoute>
               <AppLayout>
@@ -83,39 +152,29 @@ export default function App() {
         />
 
         <Route
-          path="/member_dash_comp/contribution-list"
+          path="/group/dividends"
           element={
             <PrivateRoute>
               <AppLayout>
-                <ContributionList />
+                <DividendsPage />
               </AppLayout>
             </PrivateRoute>
           }
         />
 
         <Route
-          path="/member_dash_comp/contribution-form"
+          path="/group/make-deposit"
           element={
             <PrivateRoute>
               <AppLayout>
-                <ContributionForm />
+                <MakeDepositPage />
               </AppLayout>
             </PrivateRoute>
           }
         />
 
-        <Route
-          path="/secretary-dashboard"
-          element={
-            <PrivateRoute allowedRoles={['secretary']}>
-              <AppLayout>
-                <SecretaryDashboardPage />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Catch all route - redirect to home */}
+        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -5,7 +5,8 @@ import { Input } from '../../components/ui/input';
 import { Card, CardContent } from '../../components/ui/card';
 import { Typography } from '../../components/ui/typography';
 import { ArrowLeft } from 'lucide-react';
-
+import { useAuthStore } from '../../store/auth';
+import type { User, UserRole } from '../../types';
 
 interface GroupRegistrationData {
   group_name: string;
@@ -13,14 +14,18 @@ interface GroupRegistrationData {
   account_no: string;
   chairman_name: string;
   chairman_email: string;
+  chairman_password: string;
   secretary_name: string;
   secretary_email: string;
   treasurer_name: string;
   treasurer_email: string;
 }
 
+const generateId = () => Math.random().toString(36).substr(2, 9);
+
 export function ChairpersonRegistrationPage() {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<GroupRegistrationData>({
@@ -29,6 +34,7 @@ export function ChairpersonRegistrationPage() {
     account_no: '',
     chairman_name: '',
     chairman_email: '',
+    chairman_password: '',
     secretary_name: '',
     secretary_email: '',
     treasurer_name: '',
@@ -56,54 +62,57 @@ export function ChairpersonRegistrationPage() {
     setLoading(true);
     setError(null);
 
-    // Log form data before sending
-    console.log('Form Data:', formData);
-    console.log('Selected File:', selectedFile);
-
-    // Validation: Check if group name is empty
-    if (!formData.group_name) {
-      setError('Group name is required');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const groupFormData = new FormData();
-
-      // Append all form data
-      Object.entries(formData).forEach(([key, value]) => {
-        groupFormData.append(key, value);
-      });
-
-      // Append the selected file if it exists
-      if (selectedFile) {
-        groupFormData.append('file', selectedFile);
+      // Validate form data
+      if (!formData.chairman_email || !formData.chairman_password || !formData.chairman_name) {
+        throw new Error('Please fill in all required fields');
       }
 
-      // Debug log the FormData object
-      for (let [key, value] of groupFormData.entries()) {
-        console.log(key, value);
+      if (!selectedFile) {
+        throw new Error('Please select a file to upload');
       }
 
-      // Make the fetch request
-      const response = await fetch('http://localhost:8080/register/group', {
-        method: 'POST',
-        body: groupFormData, // FormData handles the headers automatically
-      });
+      // Create chairman user
+      const chairmanUser: User = {
+        id: generateId(),
+        email: formData.chairman_email,
+        name: formData.chairman_name,
+        role: 'chairman',
+        joinedAt: new Date().toISOString(),
+        totalContributions: 0,
+      };
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Group registration failed');
-      }
+      // Store group data in localStorage
+      const groupData = {
+        id: generateId(),
+        name: formData.group_name,
+        email: formData.email,
+        accountNo: formData.account_no,
+        chairman: chairmanUser,
+        secretary: {
+          name: formData.secretary_name,
+          email: formData.secretary_email,
+        },
+        treasurer: {
+          name: formData.treasurer_name,
+          email: formData.treasurer_email,
+        },
+        createdAt: new Date().toISOString(),
+      };
 
+      localStorage.setItem('groupData', JSON.stringify(groupData));
+
+      // Auto-login the chairman
+      login(chairmanUser);
+
+      // Navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col py-12 sm:px-6 lg:px-8">
@@ -201,6 +210,15 @@ export function ChairpersonRegistrationPage() {
                         required
                         placeholder="chairman@example.com"
                       />
+                      <Input
+                        label="Chairman Password"
+                        name="chairman_password"
+                        type="password"
+                        value={formData.chairman_password}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Enter chairman's password"
+                      />
                     </div>
                   </div>
 
@@ -271,15 +289,6 @@ export function ChairpersonRegistrationPage() {
                     Upload any required group registration documents
                   </p>
                 </div>
-                <Input
-                        label="Chairman Passowrd"
-                        name="  chairman_password"
-                        type="password"
-                        value={formData.Chairman_password}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="enter your password"
-                      />
               </div>
 
               {error && (

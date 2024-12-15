@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Navbar } from './components/layout/navbar';
+import { Navbar } from './components/ui/navbar';
 import { LoginPage } from './pages/auth/login';
 import { DashboardPage } from './pages/dashboard';
 import { ContributionsPage } from './pages/contributions';
@@ -7,6 +7,7 @@ import { MembersPage } from './pages/members';
 import { DividendsPage } from './pages/dividends';
 import { SecretaryDashboardPage } from './pages/secretary-dashboard';
 import { LandingPage } from './pages/landing';
+import { AboutPage } from './pages/about';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
 import { useAuthStore } from './store/auth';
@@ -31,9 +32,11 @@ function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairm
 }
 
 function AppLayout({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {isAuthenticated && <Navbar />}
       <main>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {children}
@@ -48,6 +51,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route

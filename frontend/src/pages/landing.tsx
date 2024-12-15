@@ -40,8 +40,8 @@ export function LandingPage() {
         className="fixed inset-0 z-0"
         style={{
           backgroundImage: 'url(/bg.webp)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundSize: 'contain',
+          backgroundPosition: 'left',
           backgroundRepeat: 'no-repeat',
           backgroundAttachment: 'fixed'
         }}

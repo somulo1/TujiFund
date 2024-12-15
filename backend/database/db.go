@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"log"
 
 	"tujifund/backend/models"
 
@@ -20,7 +21,9 @@ func InitDB() {
 		return
 	}
 	// Migrate Schema(create table 'users')
-	err := DB.AutoMigrate(&models.User{}, &models.Chama{})
+
+	err := DB.AutoMigrate(&models.User{}, &models.Chama{},&models.Transaction{})
+
 	if err != nil {
 		fmt.Println("failed to migrate schema: ", err)
 		return
@@ -42,7 +45,7 @@ func AddUser(user *models.User) error {
 	if result.Error != nil {
 		return fmt.Errorf("failed to add user: %w", result.Error)
 	}
-	fmt.Println("User added successfully", user.Email)
+	fmt.Println("User added successfully:", user.Email)
 	return nil
 }
 
@@ -57,7 +60,6 @@ func GetUserPasswd(email string) (string, string, error) {
 }
 
 func AddGroup(group *models.Chama) error {
-
 	var existingGroup models.User
 
 	result := DB.Where("email = ?", group.Email).First(&existingGroup)
@@ -68,12 +70,22 @@ func AddGroup(group *models.Chama) error {
 	// initialize dialect
 	result = DB.Create(group)
 	if result.Error != nil {
-		 return fmt.Errorf("failed to add user: %w", result.Error)
+		return fmt.Errorf("failed to add user: %w", result.Error)
 	}
-	fmt.Println("User added successfully", group.Name)
+	fmt.Println("Group added successfully:", group.Name)
 	return nil
 }
 
-func GroupExists(groupName string) bool{
+
+func GroupExists(groupName string) bool {
 	return false
+}
+
+func AddTransaction(transaction *models.Transaction) error {
+	// Save the transaction to the database (assuming GORM is set up)
+	if err := DB.Create(&transaction).Error; err != nil {
+		log.Printf("Error saving transaction: %v", err)
+		return err
+	}
+	return nil
 }

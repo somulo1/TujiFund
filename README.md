@@ -1,90 +1,100 @@
-# TujiFund
+# TujiFund App
 
+TujiFund App is a powerful financial management platform designed specifically for cooperative groups (Chamas). It enables seamless tracking of individual contributions, dividend calculation, transaction management, and real-time updates, empowering members and administrators with greater control and visibility of their finances.
 
-# TUJIFUND
+## Features
 
-Start sqlite3 db
-```
-sqlite3 tujifund.db
-```
-update dependencies
-```
-go mod tidy
-```
-run go server
+User Authentication & Authorization: Secure sign-up, login, and role-based access for members and admins.
 
+Contribution Tracking: Track individual member contributions, making it easier to monitor progress and ensure transparency.
+
+Dividend Calculation & Distribution: Automated calculations and fair distribution of dividends based on contributions.
+
+Real-time Updates: Stay updated with live data using WebSockets for an interactive user experience.
+
+Financial Reports & Visualizations: Access comprehensive financial reports and interactive visualizations to understand the group's financial health.
+
+Admin Dashboard: Manage group members, track activities, and oversee all transactions from a dedicated admin interface.
+
+## Getting Started
+
+Follow these instructions to set up and run the TujiFund App locally on your machine.
+
+## Prerequisites
+
+Before you begin, ensure the following software are installed:
+
+   * Go version 1.22.2 or higher (ServerSide)
+   * React.js (for frontend)
+   * SQLite3 (for database management)
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/somulo1/TujiFund.git
 ```
-go run backend/cmd/chama-server/main.go 
+
+Navigate to the project directory:
+
+```bash
+cd TujiFund
 ```
-/chama-app
-├── /backend
-│   ├── /cmd
-│   │   └── chama-server/
-│   │       └── main.go               # Entry point for the backend service
-│   ├── /config
-│   │   └── config.go                 # Configuration settings (e.g., DB, JWT keys)
-│   ├── /controllers
-│   │   ├── authController.go         # Authentication controller
-│   │   ├── adminController.go        # Admin management functions
-│   │   └── memberController.go       # Member contribution and dividend functions
-│   ├── /models
-│   │   ├── user.go                   # User model (with role-based permissions)
-│   │   ├── contribution.go           # Contribution model
-│   │   ├── transaction.go            # Transaction model (including dividends)
-│   │   └── report.go                 # Report model for financial data
-│   ├── /routes
-│   │   ├── authRoutes.go             # Authentication routes
-│   │   ├── adminRoutes.go            # Admin-specific routes
-│   │   └── memberRoutes.go           # Member-specific routes
-│   ├── /services
-│   │   ├── authService.go            # Authentication logic (JWT, login)
-│   │   ├── contributionService.go    # Logic for adding and updating contributions
-│   │   ├── dividendService.go        # Logic for dividend calculation and disbursement
-│   │   ├── reportService.go          # Financial reports logic (charts, statistics)
-│   │   └── chatService.go            # WebSocket logic for real-time communication
-│   ├── /utils
-│   │   ├── db.go                     # Database connection utility
-│   │   ├── jwt.go                    # JWT token generation and verification
-│   │   └── helper.go                 # Other utility functions
-│   ├── /middleware
-│   │   ├── authMiddleware.go         # Middleware for protected routes
-│   │   └── roleMiddleware.go         # Middleware to check user roles (admin, member)
-│   ├── /websocket
-│   │   └── websocketServer.go        # WebSocket server logic for real-time updates
-│   └── go.mod                        # Go modules file (for dependency management)
-├── /frontend
-│   ├── /public
-│   │   └── index.html                # Main HTML file for the frontend
-│   ├── /src
-│   │   ├── /assets
-│   │   │   ├── /images               # Images for the UI (logo, icons, etc.)
-│   │   │   └── /styles               # Global styles (CSS/SCSS files)
-│   │   ├── /components
-│   │   │   ├── Header.js             # Common header component
-│   │   │   ├── Footer.js             # Common footer component
-│   │   │   ├── MemberDashboard.js    # Member dashboard component
-│   │   │   ├── AdminDashboard.js     # Admin dashboard component (secretary, chairman, etc.)
-│   │   │   ├── ContributionList.js   # Contribution history component
-│   │   │   └── Chat.js               # Real-time chat component
-│   │   ├── /contexts
-│   │   │   └── AuthContext.js        # Auth context to manage user authentication state
-│   │   ├── /pages
-│   │   │   ├── Home.js               # Landing page for the app
-│   │   │   ├── Login.js              # Login page
-│   │   │   ├── Dashboard.js          # Main dashboard page (conditional for admin/member)
-│   │   │   └── Reports.js            # Page for viewing financial reports
-│   │   ├── /services
-│   │   │   ├── authService.js        # Authentication functions (login, signup)
-│   │   │   ├── apiService.js         # API requests handling (Axios or Fetch)
-│   │   │   └── websocketService.js   # WebSocket service for real-time updates
-│   │   ├── /utils
-│   │   │   └── helpers.js            # Helper functions (date formatting, etc.)
-│   │   ├── App.js                    # Main App component (router, layout)
-│   │   └── index.js                  # Entry point for React
-│   ├── package.json                  # Frontend dependencies
-│   └── .env                          # Environment variables (API URL, WebSocket URL)
-├── /docs
-│   └── README.md                     # High-level documentation and project overview
-└── /scripts
-    └── deploy.sh                     # Deployment scripts (Docker, CI/CD, etc.)
+
+Install Go dependencies:
+
+* Run the following command to install required Go packages:
+
+  go mod tidy
+
+* Install Node.js dependencies (if applicable):
+
+* Set up SQLite3 database:
+
+Create and configure your SQLite3 database file (if not already created).
+Update any necessary environment variables in .env or configuration files for database connection and other settings.
+
+Run the application:
+
+To start the application, run the following command:
+
+```bash
+go run backend/cmd/main.go
 ```
+
+our application will be running locally at http://localhost:8080.
+
+## Contributing
+
+We welcome contributions to improve TujiFund App. To contribute:
+
+* Fork the repository.
+* Create a new branch (git checkout -b feature-branch).
+* Make your changes and commit (git commit -am 'Add new feature').
+* Push to the branch (git push origin feature-branch).
+* Open a pull request for review.
+
+## License
+
+This project is licensed under the [MIT](https://choosealicense.com/licenses/mit/) License - see the LICENSE file for details.
+
+## Contributors
+
+Fred Gitonga    [FredMunene](https://github.com/FredMunene)
+
+Godwin Ouma     [oumaoumag](https://github.com/oumaoumag)
+
+Samuel Omullo   [samuelomulo](https://github.com/somulo1/TujiFund.git)
+
+Stephens Odhiambo [steodhiambo](https://github.com/steodhiambo)
+
+Hilary Omondi   [Hilary505](https://github.com/Hilary505/)
+
+<div style="display: flex; gap: 10px;">
+  <img src="https://learn.zone01kisumu.ke/git/avatars/1070f57cab96cb5627875bdb2b968ea5?size=870" alt="User Avatar 1" width="100" height="100" style="border-radius: 50%;" />
+  <img src="https://learn.zone01kisumu.ke/git/avatars/9697c89a28a5879bddc2e28fac7b679e?size=870" alt="User Avatar 2" width="100" height="100" style="border-radius: 50%;" />
+  <img src="https://learn.zone01kisumu.ke/git/avatars/d8351a9a577a3ef57486ba1e24819c8c?size=870" alt="User Avatar 3" width="100" height="100" style="border-radius: 50%;" />
+  <img src="https://learn.zone01kisumu.ke/git/avatars/21a8520289459579567a739fc8de9d33?size=870" alt="User Avatar 4" width="100" height="100" style="border-radius: 50%;" />
+  <img src="https://learn.zone01kisumu.ke/git/avatars/d05acb5758f408a6bf45142f8d5462ca?size=870" alt="User Avatar 5" width="100" height="100" style="border-radius: 50%;" />
+</div>

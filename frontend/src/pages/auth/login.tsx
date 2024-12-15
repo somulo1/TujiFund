@@ -1,9 +1,9 @@
-// login.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { useAuthStore } from '../../store/auth';
-import { TEST_ACCOUNTS } from '../../config/auth';
+import { ArrowLeft } from 'lucide-react';
+import { Input } from '../../components/ui/input';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -12,92 +12,93 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
 
-    const account = TEST_ACCOUNTS.find(
-      (acc) => acc.email === email && acc.password === password
-    );
-
-    if (!account) {
+    const success = await login(email, password);
+    if (success) {
+      navigate('/dashboard');
+    } else {
       setError('Invalid email or password');
-      return;
     }
-
-    login({
-      id: email,
-      name: account.name,
-      email: account.email,
-      role: account.role,
-    });
-    navigate('/dashboard');
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          {error && (
-            <p className="mt-2 text-center text-sm text-red-600">{error}</p>
-          )}
-          <div className="mt-4">
-            <p className="text-center text-sm text-gray-600">
-              Available test accounts:
-            </p>
-            <div className="mt-2 text-sm text-gray-500 space-y-1">
-              {TEST_ACCOUNTS.map((account) => (
-                <p key={account.email} className="text-center">
-                  <strong>{account.role}</strong>: {account.email} / {account.password}
-                </p>
-              ))}
-            </div>
-          </div>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+      {/* Back Button */}
+      <div className="absolute top-4 left-4">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </Button>
+      </div>
+
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
+          <p className="mt-2 text-gray-600">
+            Sign in to your account to continue
+          </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <p className="text-sm text-red-600 text-center">{error}</p>
+          )}
+          
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
           </div>
 
-          <Button type="submit" className="w-full">
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full bg-[#2c583e] hover:bg-[#1e3c2a] text-white"
+          >
             Sign in
           </Button>
-          <p>dont have and account? <a href="register">register</a></p>
         </form>
+
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Button
+              variant="link"
+              className="text-[#2c583e] hover:text-[#1e3c2a]"
+              onClick={() => navigate("/register-chairperson")}
+            >
+              Register here
+            </Button>
+          </p>
+        </div>
       </div>
     </div>
   );

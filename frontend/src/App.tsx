@@ -1,17 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Header } from './components/layout/header';
-import { Sidebar } from './components/layout/sidebar';
+import { Navbar } from './components/ui/navbar';
 import { LoginPage } from './pages/auth/login';
 import { DashboardPage } from './pages/dashboard';
 import { ContributionsPage } from './pages/contributions';
 import { MembersPage } from './pages/members';
 import { DividendsPage } from './pages/dividends';
 import { SecretaryDashboardPage } from './pages/secretary-dashboard';
-import { useAuthStore } from './store/auth';
+import { LandingPage } from './pages/landing';
+import { AboutPage } from './pages/about';
 import ContributionList from './components/member_dash_comp/contribution-list';
 import ContributionForm from './components/member_dash_comp/contribution-form';
-import { MemberList } from './components/members/member-list';
-import {MemberProfile} from "./components/member_dash_comp/member-profile";
+import { useAuthStore } from './store/auth';
+import { ChairpersonRegistrationPage } from './pages/auth/register-chairperson'; 
 
 function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairman', 'treasurer'] }: { 
   children: React.ReactNode;
@@ -28,15 +28,16 @@ function PrivateRoute({ children, allowedRoles = ['member', 'secretary', 'chairm
     return <Navigate to="/dashboard" />;
   }
 
-  return children;
+  return <>{children}</>;
 }
 
 function AppLayout({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      <Sidebar />
-      <main className="lg:pl-64">
+      {isAuthenticated && <Navbar />}
+      <main>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </div>
@@ -46,33 +47,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const members = [
-    { 
-      id: '1', 
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'member' as const,
-      joinedAt: new Date().toISOString()
-    },
-    { 
-      id: '2', 
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      role: 'member' as const,
-      joinedAt: new Date().toISOString()
-    }
-    // Add more members as needed
-  ];
-
-  const onSelectMember = (memberId: string) => {
-    console.log(`Selected member ID: ${memberId}`);
-    // Add your logic for handling member selection here
-  };
-
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
+
         <Route
           path="/dashboard"
           element={
@@ -83,6 +64,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/contributions"
           element={
@@ -93,6 +75,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/members"
           element={
@@ -103,6 +86,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/member_dash_comp/contribution-list"
           element={
@@ -113,6 +97,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/member_dash_comp/contribution-form"
           element={
@@ -123,26 +108,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/member_dash_comp/member-list"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <MemberList members={members} onSelectMember={onSelectMember} />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/member_dash_comp/member-profile"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <MemberProfile />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
+
         <Route
           path="/secretary-dashboard"
           element={
@@ -153,17 +119,10 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/dividends"
-          element={
-            <PrivateRoute>
-              <AppLayout>
-                <DividendsPage />
-              </AppLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        <Route path="/register-chairperson" element={<ChairpersonRegistrationPage />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

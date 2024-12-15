@@ -5,20 +5,39 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
-	"text/template"
 
-	"tujifund/backend/models"
 	"tujifund/backend/database"
+	"tujifund/backend/models"
+	"tujifund/backend/services"
+)
 
-)
-var (
-	mu        sync.Mutex                  // Mutex to handle concurrent access
-)
+var mu sync.Mutex // Mutex to handle concurrent access
+
+// CORS middleware function
+func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        // Set CORS headers for all responses
+        w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5174")
+        w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+        w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+        w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+        // Handle preflight requests
+        if r.Method == "OPTIONS" {
+            w.WriteHeader(http.StatusOK)
+            return
+        }
+
+        // Call the actual handler
+        handler(w, r)
+    }
+}
 
 // function to handle models.User registration
 func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,8 +64,24 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // function to handle models.User login
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	// Set headers for CORS
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5174")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+	// Handle preflight requests
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Invalid request method",
+		})
 		return
 	}
 
@@ -57,97 +92,128 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	var loginReq LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Invalid request body",
+		})
 		return
 	}
 
-	mu.Lock()
-	defer mu.Unlock()
-
-	dbPassword, _, err := database.GetUserPasswd(loginReq.Email)
-	if err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
-		return
+	// Hardcoded test credentials
+	testCredentials := map[string]struct {
+		password string
+		role     string
+	}{
+		"chairman@test.com": {
+			password: "chairman123",
+			role:     "Chairman",
+		},
+		"treasurer@test.com": {
+			password: "treasurer123",
+			role:     "Treasurer",
+		},
+		"secretary@test.com": {
+			password: "secretary123",
+			role:     "Secretary",
+		},
+		"member@test.com": {
+			password: "member123",
+			role:     "Member",
+		},
 	}
 
-	if dbPassword != loginReq.Password {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
-		return
+	// Check if the email exists in test credentials
+	if creds, exists := testCredentials[loginReq.Email]; exists {
+		if creds.password == loginReq.Password {
+			// Successful login
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": true,
+				"message": "Login successful",
+				"user": map[string]interface{}{
+					"email": loginReq.Email,
+					"role":  creds.role,
+				},
+			})
+			return
+		}
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Login successful")
+	// Invalid credentials
+	w.WriteHeader(http.StatusUnauthorized)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": false,
+		"message": "Invalid email or password",
+	})
 }
 
 // register group handler
+func RegisterGroupHandler(w http.ResponseWriter, r *http.Request) {
+    // Set response headers consistently at the start
+    w.Header().Set("Content-Type", "application/json")
+    
+    // Validate request method first
+    if r.Method != http.MethodPost {
+        sendJSONError(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
 
-func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/register" {
-		notFoundErrorHandler(w)
-		return
-	}
-	if r.Method != http.MethodGet {
-		wrongMethodErrorHandler(w)
-		return
-	}
+    // Validate endpoint path
+    if r.URL.Path != "/register/group" {
+        sendJSONError(w, "Invalid endpoint", http.StatusNotFound)
+        return
+    }
 
-	err := r.ParseMultipartForm(10 << 20)
-	if err != nil {
-		internalServerErrorHandler(w)
-		return
-	}
+    // Parse multipart form with explicit size limit
+    const maxFileSize = 10 << 20 // 10 MB
+    if err := r.ParseMultipartForm(maxFileSize); err != nil {
+        sendJSONError(w, "Error parsing form data: file size may be too large", http.StatusBadRequest)
+        return
+    }
 
-	chairman := models.User{
-		Name:  r.FormValue("chairman_name"),
-		Email: r.FormValue("chairman_email"),
-	}
+    // Extract and validate group data
+    group := models.Chama{
+        Name:           r.FormValue("group_name"),
+        Email:          r.FormValue("email"),
+        ChairmanName:  r.FormValue("chairman_name"),
+        TreasurerName: r.FormValue("treasurer_name"),
+        SecretaryName: r.FormValue("secretary_name"),
+        ChairmanEmail: r.FormValue("chairman_email"),
+        TreasurerEmail: r.FormValue("treasurer_email"),
+        SecretaryEmail: r.FormValue("secretary_email"),
+    }
 
-	treasurer := models.User{
-		Name:  r.FormValue("treasurer_name"),
-		Email: r.FormValue("treasurer_email"),
-	}
-	secretary := models.User{
-		Name:  r.FormValue("secretary_name"),
-		Email: r.FormValue("secretary_email"),
-	}
-	// Validate form values (e.g., required fields)
-	if chairman.Name == "" || treasurer.Name == "" || secretary.Name == "" {
-		http.Error(w, "Missing required user details", http.StatusBadRequest)
-		return
-	}
+    // Parse account number separately to handle conversion errors
+    if accountNo, err := strconv.ParseInt(r.FormValue("account_no"), 10, 64); err == nil {
+        group.AccountNo = accountNo
+    } else {
+        sendJSONError(w, "Invalid account number format", http.StatusBadRequest)
+        return
+    }
 
-	groupName := r.FormValue("name")
-	if groupName == "" {
-		http.Error(w, "Group name is required", http.StatusBadRequest)
-		return
-	}
+    // Validate required group fields
+    if !isValidGroup(&group) {
+        sendJSONError(w, "Missing required group fields", http.StatusBadRequest)
+        return
+    }
 
-	// Check if group name is unique
-	if database.GroupExists(groupName) {
-		http.Error(w, "Group name already exists", http.StatusConflict)
-		return
-	}
+    // Extract and validate chairman password
+    chairmanPassword := r.FormValue("chairman_password")
+    if chairmanPassword == "" {
+        sendJSONError(w, "Chairman password is required", http.StatusBadRequest)
+        return
+    }
 
-	accountNoString := r.FormValue("account-no")
-	accountNoInt, err := strconv.ParseInt(accountNoString, 10, 64)
-	if err != nil {
-		badRequestHandler(w)
-		return
-	}
-
-	group := models.Chama{
-		Name:      r.FormValue("name"),
-		AccountNo: int64(accountNoInt),
-		Chairman:  chairman,
-		Secretary: secretary,
-		Treasurer: treasurer,
-	}
-	// verify group name is unique
+    // Check if group already exists
+    if database.GroupExists(group.Name) {
+        sendJSONError(w, "Group name already exists", http.StatusConflict)
+        return
+    }
 
 	// Handle file upload
-	// save file
 	file, handler, err := r.FormFile("file")
 	if err != nil {
+		println("error readinf file", err) // error here for files
 		internalServerErrorHandler(w)
 		return
 	}
@@ -158,31 +224,30 @@ func ResgisterGroupHandler(w http.ResponseWriter, r *http.Request) {
 	saveDir := "./uploads"
 	if _, err := os.Stat(saveDir); os.IsNotExist(err) {
 		if err := os.Mkdir(saveDir, os.ModePerm); err != nil {
+			println("error creating file directory")
 			http.Error(w, "Unable to create upload directory", http.StatusInternalServerError)
 			return
 		}
 	}
 
-	// Create the destination file
-	savePath := filepath.Join(saveDir, handler.Filename)
-	destFile, err := os.Create(savePath)
+	users, err := services.ReadCSV(file)
 	if err != nil {
-		http.Error(w, "Unable to create the file", http.StatusInternalServerError)
+		println("error readinf file", err)
+		internalServerErrorHandler(w)
 		return
 	}
-	defer destFile.Close()
-
-	// Copy the uploaded file's content to the destination file
-	if _, err := io.Copy(destFile, file); err != nil {
-		http.Error(w, "Unable to save the file", http.StatusInternalServerError)
-		return
+	for _, user := range users {
+		database.AddUser(&user)
 	}
 
 	if err := database.AddGroup(&group); err != nil {
+		println("error adding group to db")
 		http.Error(w, "Failed to save group", http.StatusInternalServerError)
 		return
 	}
 
+	// add a secret bearer 
+	w.Header().Set("Authorization", "Bearer "+"secret_token")
 	fmt.Fprintf(w, "<p> Group added sucessfully</p>")
 }
 
@@ -204,20 +269,56 @@ func badRequestHandler(w http.ResponseWriter) {
 
 func renderErrorPage(w http.ResponseWriter, statusCode int, message string) {
 	w.WriteHeader(statusCode)
-	tmpl, err := template.ParseFiles("template/error.html")
-	if err != nil {
-		log.Println("Error page parsing error:", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+	// tmpl, err := template.ParseFiles("template/error.html")
+	// if err != nil {
+	// 	log.Println("Error page parsing error:", err)
+	// 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	// 	return
 
+	// }
+	// data := struct {
+	// 	Message string
+	// }{
+	// 	Message: message,
+	// }
+	// if err := tmpl.Execute(w, data); err != nil {
+	log.Println("Error: page execution:", message)
+	http.Error(w, "Internal Server Error", statusCode)
+	// }
+}
+
+func GetTotalAmount(w http.ResponseWriter, r *http.Request) {
+	// Get the userID from the query parameter
+	userIDParam := r.URL.Query().Get("user_id")
+	if userIDParam == "" {
+		http.Error(w, "user_id is required", http.StatusBadRequest)
+		return
 	}
-	data := struct {
-		Message string
-	}{
-		Message: message,
+
+	// Convert userID from string to uint
+	userID, err := strconv.ParseUint(userIDParam, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid user_id", http.StatusBadRequest)
+		return
 	}
-	if err := tmpl.Execute(w, data); err != nil {
-		log.Println("Error: page execution:", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+
+	// Call the service layer to get the total amount for the user
+	totalAmount, err := services.GetTotalAmount(uint(userID))
+	if err != nil {
+		http.Error(w, "Error calculating total amount", http.StatusInternalServerError)
+		return
+	}
+
+	// Create the response
+	response := map[string]interface{}{
+		"user_id":      userID,
+		"total_amount": totalAmount,
+	}
+
+	// Set content-type header to JSON and write the response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 	}
 }

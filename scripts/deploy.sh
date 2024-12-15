@@ -2,21 +2,24 @@
 
 # Build backend
 echo "Building backend..."
-cd backend/cmd/chama-server
-go build -o chama-server
+cd backend/cmd/
+go build -o  tujifundApp main.go
 
-# Build frontend
-echo "Building frontend..."
-cd ../../../frontend
-npm run build
+./tujifundApp
 
-# Deploy backend
-echo "Deploying backend..."
-# TODO: Add commands to deploy the backend (e.g., copying files to server, restarting service)
+# # Build frontend
+# echo "Building frontend..."
+# cd ../../../frontend
+# npm run build
 
-# Deploy frontend
-echo "Deploying frontend..."
-# TODO: Add commands to deploy the frontend (e.g., copying build files to web server)
+# # Deploy backend
+# echo "Deploying backend..."
+# # TODO: Add commands to deploy the backend (e.g., copying files to server, restarting service)
 
-echo "Deployment complete!"
+
+# # Deploy frontend
+# echo "Deploying frontend..."
+# # TODO: Add commands to deploy the frontend (e.g., copying build files to web server)
+
+# echo "Deployment complete!"
 

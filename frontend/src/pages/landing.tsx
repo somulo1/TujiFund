@@ -70,7 +70,7 @@ export function LandingPage() {
               <span className="text-[#2c583e]">TujiFund</span>
             </h1>
             <p className="mt-6 text-xl sm:text-2xl text-gray-200 font-medium">
-              The Ultimate Chama Management Solution. Streamline your group savings, 
+              The Ultimate Solution to  local investment and saving groups. Streamline your group savings, 
               automate record keeping, and grow your investments together.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
@@ -139,7 +139,7 @@ export function LandingPage() {
             className="text-4xl sm:text-5xl font-bold text-white text-center mb-12"
             variants={itemVariants}
           >
-            Everything You Need to Manage Your Chama
+            Everything You Need to Manage in Your Chama
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -181,7 +181,7 @@ export function LandingPage() {
                 variants={itemVariants}
               >
                 <div className="flex-shrink-0">
-                  <CheckCircle className="h-6 w-6 text-[#2c583e]" />
+                  <CheckCircle className="h-6 w-6 text-[#f66151]" />
                 </div>
                 <div>
                   <h3 className="text-xl font-medium text-white">{benefit.title}</h3>

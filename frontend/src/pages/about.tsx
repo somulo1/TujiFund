@@ -123,18 +123,28 @@ const features = [
 // Team Data
 const team = [
   {
-    name: 'Sarah Johnson',
+    name: 'Samuel Omulo',
     role: 'Founder & CEO',
-    description: 'Financial technology expert with 15 years of experience in community banking',
+    description: 'Software with 5 years of experience in Fintech, over 5 years in Computer security and forensics',
   },
   {
-    name: 'David Kimani',
-    role: 'Head of Technology',
+    name: 'Godfrey Ouma Ouma',
+    role: 'Frontend developer, UI/UX',
     description: 'Seasoned software engineer specializing in secure financial systems',
   },
   {
-    name: 'Grace Muthoni',
-    role: 'Community Lead',
-    description: 'Passionate about empowering communities through financial education',
+    name: 'Fred Gitonga',
+    role: 'ICP developer specialising in blockchain development',
+    description: 'Passionate about Securing systems',
+  },
+  {
+    name: 'Hilary Omondi',
+    role: 'backend developer and blockcahin development',
+    description: 'Passionate about Securing systems',
+  },
+  {
+    name: 'Stephen Odhiambo',
+    role: 'Software Developer and communication lead',
+    description: 'Passionate about Securing systems and cummunity development',
   },
 ];

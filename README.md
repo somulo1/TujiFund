@@ -65,6 +65,17 @@ go run backend/cmd/main.go
 
 our application will be running locally at http://localhost:8080.
 
+## setting up the frontend
+```bash
+cd frontend
+```
+```bash
+npm install
+```
+### start the frontend
+```bash
+npm run dev
+```
 ## Contributing
 
 We welcome contributions to improve TujiFund App. To contribute:
